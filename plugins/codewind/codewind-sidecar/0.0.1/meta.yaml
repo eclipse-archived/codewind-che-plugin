@@ -9,7 +9,7 @@
 #     IBM Corporation - initial API and implementation
 ################################################################################
 
-id: codewind-plugin
+id: codewind-sidecar
 apiVersion: v2
 version: 0.0.1
 type: Che Plugin
