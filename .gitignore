@@ -1,0 +1,4 @@
+.project
+.vscode/
+**/*.tar.gz
+.DS_Store

@@ -1,0 +1,145 @@
+################################################################################
+# Copyright (c) 2019 IBM Corporation and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v2.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v20.html
+#
+# Contributors:
+#     IBM Corporation - initial API and implementation
+################################################################################
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codewind-release-WORKSPACE_ID_PLACEHOLDER
+  labels:
+    app: codewind-pfe
+    workspace: WORKSPACE_ID_PLACEHOLDER
+spec:
+  ports:
+    - port: 9191
+      name: portal-http
+  selector:
+    app: codewind-pfe
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: codewind-release-WORKSPACE_ID_PLACEHOLDER
+  labels:
+    app: codewind-pfe
+    workspace: WORKSPACE_ID_PLACEHOLDER
+
+spec:
+  selector:
+    matchLabels:
+      app: codewind-pfe
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: codewind-pfe
+        workspace: WORKSPACE_ID_PLACEHOLDER
+      annotations:
+        productName: "codewind"
+        productID: "codewind"
+        productVersion: "19.05"
+
+    spec:
+      serviceAccountName: SERVICE_ACCOUNT_PLACEHOLDER
+      affinity:        
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: beta.kubernetes.io/arch
+                  operator: In
+                  values:
+                  - amd64
+                  - ppc64le
+      volumes:
+      - name: shared-workspace
+        persistentVolumeClaim:
+          claimName: PVC_NAME_PLACEHOLDER
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock
+      - name: registry-secret
+        secret:
+          defaultMode: 0777
+          secretName: REGISTRY_SECRET_PLACEHOLDER
+      containers:
+      - name: codewind-pfe
+        image: sys-mcs-docker-local.artifactory.swg-devops.com/codewind-pfe-amd64:latest
+        imagePullPolicy: "Always"
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: shared-workspace
+          mountPath: /codewind-workspace
+          subPath: "WORKSPACE_ID_PLACEHOLDER/projects"
+        - name: dockersock
+          mountPath: "/var/run/docker.sock"
+        - name: registry-secret
+          mountPath: "/tmp/secret"
+        env:
+          - name: IN_K8
+            value: "true"
+          - name: PORTAL_HTTPS
+            value: "true"
+          - name: KUBE_NAMESPACE
+            value: "KUBE_NAMESPACE_PLACEHOLDER"
+          - name: TILLER_NAMESPACE
+            value: "KUBE_NAMESPACE_PLACEHOLDER"
+          - name: CHE_WORKSPACE_ID
+            value: "WORKSPACE_ID_PLACEHOLDER"
+          - name: PVC_NAME
+            value: PVC_NAME_PLACEHOLDER
+          - name: FULL_NAME
+            value: codewind-release
+          - name: LOADRUNNER_IMAGE
+            value: ibmcom/microclimate-loadrunner:1903
+          - name: LOADRUNNER_MEM_REQUEST
+            value: 128Mi
+          - name: LOADRUNNER_CPU_REQUEST
+            value: 100m
+          - name: LOADRUNNER_MEM_LIMIT
+            value: 2Gi
+          - name: LOADRUNNER_CPU_LIMIT
+            value: 1000m
+          - name: SERVICE_NAME
+            value: codewind-release
+          - name: DOCKER_REGISTRY_SECRET
+            value: "REGISTRY_SECRET_PLACEHOLDER"
+          - name: DOCKER_REGISTRY_URL
+            value: "DOCKER_REGISTRY_PLACEHOLDER"
+          - name: HELM_SECRET
+            value: "microclimate-helm-secret"
+          - name: SERVICE_ACCOUNT_NAME
+            value: SERVICE_ACCOUNT_PLACEHOLDER
+          - name: MICROCLIMATE_VERSION
+            value: "19.01"
+          - name: MICROCLIMATE_RELEASE_NAME
+            value: RELEASE-NAME
+          - name: OIDC_CLOCK_TOLERANCE
+            value: "10"
+          - name: HOST_WORKSPACE_DIRECTORY
+            value: /projects
+          - name: EXTRA_GIT_OPTION
+            value: ""
+        ports:
+        - containerPort: 9191
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 100m
+          limits:
+            memory: 2Gi
+            cpu: 500m
+
+
+---

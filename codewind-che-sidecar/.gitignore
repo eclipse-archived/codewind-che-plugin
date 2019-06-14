@@ -1,0 +1,8 @@
+vendor/
+main
+app
+Gopkg.lock
+go.sum
+.project
+.vscode/
+codewind-filewatchers/

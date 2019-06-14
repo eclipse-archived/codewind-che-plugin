@@ -1,0 +1,18 @@
+sudo: required
+language: node_js
+node_js: '9'
+services:
+  - docker
+git:
+  depth: 1
+branches:
+  only:
+  - master
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- 
+  - export PATH=$HOME/.yarn/bin:$PATH ;
+script:
+  - ./scripts/build.sh
+deploy:
+  provider: script
+  script: bash ./scripts/publish.sh
