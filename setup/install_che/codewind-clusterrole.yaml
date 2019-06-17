@@ -52,13 +52,17 @@ rules:
   resources: ["persistentvolumeclaims"]
   verbs: ["delete", "create", "patch", "get", "list"]
 
+- apiGroups: ["icp.ibm.com"]
+  resources: ["images"]
+  verbs: ["get", "list", "create", "watch"]
+
 - apiGroups: ["extensions"]
   resources: ["ingresses"]
   verbs: ["get", "patch"]
 
 - apiGroups: ["apps", "extensions"]
   resources: ["deployments"]
-  verbs: ["get", "list", "create", "update", "delete"]
+  verbs: ["watch", "get", "list", "create", "update", "delete"]
 
 - apiGroups: ["extensions"]
   resources: ["replicasets"]
