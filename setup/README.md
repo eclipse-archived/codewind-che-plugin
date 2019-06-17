@@ -9,7 +9,10 @@ Note: This needs to be applied <b>before</b> installing Che and the cluster role
 1. Create the cluster role
 `kubectl apply -f clusterrole.yaml`
 
-1. Update the `cheWorkspaceClusterRole` in the Che helm chart's values.yaml file with the name of the cluster role
+2. If `global.cheWorkspaceNamespace` was set: Apply the cluster role binding
+     - Change `<namespace>` to be the Che workspace namespace
+     - Run `kubectl apply -f rolebinding.yaml`
+2. Update the `cheWorkspaceClusterRole` in the Che helm chart's values.yaml file with the name of the cluster role
 eg. `cheWorkspaceClusterRole: "eclipse-codewind"`
 
-1. Install Che
+3. Install Che
