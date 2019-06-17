@@ -27,7 +27,7 @@ EOF
 	exit 0
 }
 
-while getopts "m:i:n" OPTION; do
+while getopts "m:i:n:h" OPTION; do
     case "$OPTION" in
         m) INSTALL_MODE=$OPTARG ;;
         i) INGRESS_DOMAIN=$OPTARG ;;
