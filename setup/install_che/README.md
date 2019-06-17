@@ -1,11 +1,9 @@
-## Installing Codewind on Kubernetes
+## Installing Che for Codewind on Kubernetes
 
 ### Prerequisites
 
-1. Che operator installed. See https://github.com/eclipse/che-operator/
-    **Note:** You may need the `oc` CLI installed to run deploy.sh
-2. Kubernetes 1.11 or higher
-3. Ingress
+1. Kubernetes cluster with ingress installed
+2. Active kubectl context to the cluster
 
 ### Install
 
@@ -15,4 +13,4 @@
 2. Configure kubectl for your cluster
     - This will depend on your cluster
     - On OpenShift use `oc login`, on IBM Cloud Private, use `cloudctl login`.
-3. Run `install.sh` to deploy Eclipse Che
+3. Run `./install.sh` to deploy Eclipse Che
