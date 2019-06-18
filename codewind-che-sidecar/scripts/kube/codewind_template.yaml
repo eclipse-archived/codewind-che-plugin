@@ -65,9 +65,7 @@ spec:
       - name: shared-workspace
         persistentVolumeClaim:
           claimName: PVC_NAME_PLACEHOLDER
-      - name: dockersock
-        hostPath:
-          path: /var/run/docker.sock
+      - name: buildah-volume
       - name: registry-secret
         secret:
           defaultMode: 0777
@@ -82,8 +80,8 @@ spec:
         - name: shared-workspace
           mountPath: /codewind-workspace
           subPath: "WORKSPACE_ID_PLACEHOLDER/projects"
-        - name: dockersock
-          mountPath: "/var/run/docker.sock"
+        - name: buildah-volume
+          mountPath: "/var/lib/containers"
         - name: registry-secret
           mountPath: "/tmp/secret"
         env:
