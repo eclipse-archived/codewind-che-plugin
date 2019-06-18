@@ -62,5 +62,12 @@ fi
 echo "Patching the service account with the registry secret"
 kubectl patch serviceaccount $WORKSPACE_SERVICE_ACCOUNT -p "{\"imagePullSecrets\": [{\"name\": \"$REGISTRY_SECRET\"}]}"
 
+# Set the owner reference to the same owner of the che workspace pod to ensure Codewind resources are cleaned up when the workspace is deleted
+OWNER_REFERENCE_NAME=$( kubectl get po --selector=che.original_name=che-workspace-pod,che.workspace_id=$CHE_WORKSPACE_ID -o jsonpath='{.items[0].metadata.ownerReferences[0].name}' )
+sed -i "s/OWNER_REFERENCE_NAME_PLACEHOLDER/$OWNER_REFERENCE_NAME/g" /scripts/kube/codewind_template.yaml
+
+OWNER_REFERENCE_UID=$( kubectl get po --selector=che.original_name=che-workspace-pod,che.workspace_id=$CHE_WORKSPACE_ID -o jsonpath='{.items[0].metadata.ownerReferences[0].uid}' )
+sed -i "s/OWNER_REFERENCE_UID_PLACEHOLDER/$OWNER_REFERENCE_UID/g" /scripts/kube/codewind_template.yaml
+
 echo "Creating the Codewind deployment and service"
 sed "s/KUBE_NAMESPACE_PLACEHOLDER/$NAMESPACE/g" /scripts/kube/codewind_template.yaml | kubectl apply -f -
