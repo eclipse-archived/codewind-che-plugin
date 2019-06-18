@@ -1,40 +1,36 @@
-# Codewind Che Plugin
-The Codewind plugin for Eclipse Che!
+# Codewind Che Plug-in
+Use the Eclipse Codewind sidecar plug-in for Eclipse Che to enable Theia to communicate with the Codewind server container.
 
-[![Eclipse License](https://img.shields.io/badge/license-Eclipse-brightgreen.svg)](https://github.ibm.com/dev-ex/tempest/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/License-EPL%202.0-red.svg?label=license&logo=eclipse)](https://www.eclipse.org/legal/epl-2.0/)
 
-This repository contains the source code for the Eclipse Codewind sidecar plugin for Eclipse Che, allowing Theia to communicate with the Codewind server container.
+## What is the Eclipse Codewind sidecar container?
+The Codewind sidecar container includes the following responsibilities:
+- The sidecar deploys the Codewind server container.
+    - The sidecar renders the deployment and service templates and applies them with the `kubectl apply` command.
+    - When the workspace is shut down or deleted, the sidecar tears down Codewind and any deployed applications.
+- The sidecar sets up a reverse proxy for the Theia extension.
+    - Nginx is used for the proxy because it can handle both HTTP requests and socket.io.
+    - The Theia plug-in communicates with the reverse proxy, which then forwards requests to Codewind. This chain of communication avoids the addition of code in the Theia plug-in to discover and manage the connection to Codewind.
+- The sidecar runs the `filewatcherd` daemon to track user code changes.
+    - The `filewatcherd` daemon watches for changes in each user's project and communicates with Codewind, letting it know to start a build if required.
+    - For more information on `filewatcherd`, see [eclipse/codewind-filewatchers](https://github.com/eclipse/codewind-filewatchers).
 
-The Codewind sidecar container has a number of responsibilities:
-- Deploying the Codewind server container
-    - It renders the deployment and service templates and `kubectl apply`'s them.
-    - When the workspace is shut down or deleted, the sidecar will tear down Codewind, as well as any deployed applications.
-- Setting up a reverse proxy for the Theia extension
-    - We use Nginx for the proxy, as it can handle both HTTP requests and socket.io
-    - The Theia plugin communicates with the reverse proxy (which then forwards requests to Codewind). This prevents us from having to add code in the Theia plugin to discover and manage the connection to Codewind
-- Running the `filewatcherd` daemon, to track user code changes
-    - `filewatcherd` watches for changes in each of the user's projects, and communicates with Codewind, letting it know to start a build (if required)
-    - For more details on filewatcherd, see https://github.com/eclipse/codewind-filewatchers
 
-
-## Development
+## Developing
 
 ### Prerequisites
 
-- Docker 17.05 or higher
+- Install Docker 17.05 or later.
 
-### Build
+### Building
 
 To build the sidecar image, run `./build.sh`.
 
-### Deployment
+### Deploying
 
-Follow the readme at (https://github.com/eclipse/codewind-che-plugin/tree/master/scripts) for deployment instructions.
+For deployment instructions, see the README.md file at [eclipse/codewind-che-plugin](https://github.com/eclipse/codewind-che-plugin/tree/master/scripts).
 
 ## Contributing
-We welcome submitting issues and contributions.
-1. [Submitting bugs](https://github.com/eclipse/codewind-che-plugin/issues)
+Submit issues and contributions:
+1. [Submitting issues](https://github.com/eclipse/codewind-che-plugin/issues)
 2. [Contributing](CONTRIBUTING.md)
-
-## License
-[EPL 2.0](https://www.eclipse.org/legal/epl-2.0/)
