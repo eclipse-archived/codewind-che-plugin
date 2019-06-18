@@ -86,7 +86,6 @@ while sleep 10; do
         exit 1
     fi
     if [ $FILEWATCHERD_PROCESS_STATUS -ne 0 ]; then
-        echo "Filewatcherd process failed"
-        exit 1
+        filewatcherd $CWServiceNameEndpoint &
     fi
 done
