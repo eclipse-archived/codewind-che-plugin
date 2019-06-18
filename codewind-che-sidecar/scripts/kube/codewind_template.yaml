@@ -40,7 +40,13 @@ metadata:
   labels:
     app: codewind-pfe
     workspace: WORKSPACE_ID_PLACEHOLDER
-
+  ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: OWNER_REFERENCE_NAME_PLACEHOLDER
+      uid: OWNER_REFERENCE_UID_PLACEHOLDER
 spec:
   selector:
     matchLabels:
@@ -51,13 +57,6 @@ spec:
       labels:
         app: codewind-pfe
         workspace: WORKSPACE_ID_PLACEHOLDER
-      ownerReferences:
-        - apiVersion: apps/v1
-          blockOwnerDeletion: true
-          controller: true
-          kind: ReplicaSet
-          name: OWNER_REFERENCE_NAME_PLACEHOLDER
-          uid: OWNER_REFERENCE_UID_PLACEHOLDER
       annotations:
         productName: "codewind"
         productID: "codewind"
