@@ -12,6 +12,13 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: WORKSPACE_ID_PLACEHOLDER-ibm-privileged-psp-rb
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: OWNER_REFERENCE_NAME_PLACEHOLDER
+    uid: OWNER_REFERENCE_UID_PLACEHOLDER
 subjects:
 - kind: ServiceAccount
   name: SERVICE_ACCOUNT_PLACEHOLDER

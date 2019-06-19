@@ -35,15 +35,6 @@ else
 fi
 sed -i "s/SERVICE_ACCOUNT_PLACEHOLDER/$WORKSPACE_SERVICE_ACCOUNT/g" /scripts/kube/codewind_template.yaml
 
-# Check if we're on IBM Cloud Private and if so, apply the ibm-privileged-psp
-kubectl get images.icp.ibm.com
-if [[ $? == 0 ]]; then
-    echo "Running on IBM Cloud Private, so applying the 'ibm-privileged-psp' PodSecurityPolicy"
-    sed -i "s/SERVICE_ACCOUNT_PLACEHOLDER/$WORKSPACE_SERVICE_ACCOUNT/g" /scripts/kube/ibm-privileged-psp-rb.yaml
-    sed -i "s/WORKSPACE_ID_PLACEHOLDER/$CHE_WORKSPACE_ID/g" /scripts/kube/ibm-privileged-psp-rb.yaml
-    kubectl create -f /scripts/kube/ibm-privileged-psp-rb.yaml
-fi
-
 # Set the subpath for the projects volume mount
 echo "Setting the subpath for the projects volume mount"
 sed -i "s/WORKSPACE_ID_PLACEHOLDER/$CHE_WORKSPACE_ID/g" /scripts/kube/codewind_template.yaml
@@ -77,6 +68,17 @@ sed -i "s/OWNER_REFERENCE_NAME_PLACEHOLDER/$OWNER_REFERENCE_NAME/g" /scripts/kub
 
 OWNER_REFERENCE_UID=$( kubectl get po --selector=che.original_name=che-workspace-pod,che.workspace_id=$CHE_WORKSPACE_ID -o jsonpath='{.items[0].metadata.ownerReferences[0].uid}' )
 sed -i "s/OWNER_REFERENCE_UID_PLACEHOLDER/$OWNER_REFERENCE_UID/g" /scripts/kube/codewind_template.yaml
+
+# Check if we're on IBM Cloud Private and if so, apply the ibm-privileged-psp
+kubectl get images.icp.ibm.com
+if [[ $? == 0 ]]; then
+    echo "Running on IBM Cloud Private, so applying the 'ibm-privileged-psp' PodSecurityPolicy"
+    sed -i "s/SERVICE_ACCOUNT_PLACEHOLDER/$WORKSPACE_SERVICE_ACCOUNT/g" /scripts/kube/ibm-privileged-psp-rb.yaml
+    sed -i "s/WORKSPACE_ID_PLACEHOLDER/$CHE_WORKSPACE_ID/g" /scripts/kube/ibm-privileged-psp-rb.yaml
+    sed -i "s/OWNER_REFERENCE_NAME_PLACEHOLDER/$OWNER_REFERENCE_NAME/g" /scripts/kube/ibm-privileged-psp-rb.yaml
+    sed -i "s/OWNER_REFERENCE_UID_PLACEHOLDER/$OWNER_REFERENCE_UID/g" /scripts/kube/ibm-privileged-psp-rb.yaml
+    kubectl create -f /scripts/kube/ibm-privileged-psp-rb.yaml
+fi
 
 echo "Creating the Codewind deployment and service"
 sed "s/KUBE_NAMESPACE_PLACEHOLDER/$NAMESPACE/g" /scripts/kube/codewind_template.yaml | kubectl apply -f -
