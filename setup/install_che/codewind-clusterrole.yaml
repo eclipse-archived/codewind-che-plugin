@@ -17,8 +17,8 @@ metadata:
     app: eclipse-codewind
 rules:
 - apiGroups: ["extensions", ""]
-  resources: ["ingresses", "ingresses/status"]
-  verbs: ["delete", "create", "patch", "get", "list", "update", "watch"]
+  resources: ["ingresses", "ingresses/status", "podsecuritypolicies"]
+  verbs: ["delete", "create", "patch", "get", "list", "update", "watch", "use"]
 
 - apiGroups: [""]
   resources: ["namespaces"]
