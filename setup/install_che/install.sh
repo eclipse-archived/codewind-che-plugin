@@ -93,7 +93,7 @@ else
         --set global.cheWorkspacesNamespace=$CHE_NAMESPACE \
         --set global.cheWorkspaceClusterRole=eclipse-codewind \
         --set che.workspace.devfileRegistryUrl="https://che-devfile-registry.openshift.io/" \
-        --set che.workspace.pluginRegistryUrl="https://che-plugin-registry.openshift.io/v3" ./
+        --set che.workspace.pluginRegistryUrl="https://che-plugin-registry.openshift.io/v3" --tls ./
     
     kubectl apply -f ${BASE_DIR}/codewind-rolebinding.yaml -n $CHE_NAMESPACE
 fi
