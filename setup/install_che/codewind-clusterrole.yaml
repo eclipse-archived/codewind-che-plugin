@@ -84,6 +84,10 @@ rules:
   resources: ["subjectaccessreviews"]
   verbs: ["create"]
 
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["rolebindings", "roles", "clusterroles"]
+  verbs: ["create", "get", "patch", "list"]
+
 - apiGroups: [""]
   resources: ["events"]
   verbs: ["create", "patch", "update"]
