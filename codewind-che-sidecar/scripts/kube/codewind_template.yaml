@@ -142,6 +142,10 @@ spec:
             value: /projects
           - name: EXTRA_GIT_OPTION
             value: ""
+          - name: OWNER_REF_NAME
+            value: OWNER_REFERENCE_NAME_PLACEHOLDER
+          - name: OWNER_REF_UID
+            value: OWNER_REFERENCE_UID_PLACEHOLDER
         ports:
         - containerPort: 9191
         resources:
