@@ -89,8 +89,10 @@ fi
 # Set the Docker registry secret
 kubectl get secret $CHE_WORKSPACE_ID-private-registries > /dev/null 2>&1
 if [[ $? != 0 ]]; then
-    echo "Unable to find Che docker registry secret. PFE deployment may fail."
-    echo "Please create a secret via the Che dashboard."
+    message="Unable to find Che docker registry secret. PFE deployment may fail. Please create a secret via the Che dashboard."
+    echo "$message"
+    key=DOCKER_REGISTRY_SECRET_NOT_FOUND
+    updateDeployStatus $key $DEPLOY_STATUS_FILE $message
 else
     REGISTRY_SECRET=$CHE_WORKSPACE_ID-private-registries
     echo "Setting the registry secret"
