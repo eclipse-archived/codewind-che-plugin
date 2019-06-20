@@ -10,8 +10,9 @@
 ################################################################################
 
 ---
-specVersion: 0.0.1
-name: codewind-plugin-env
+apiVersion: 1.0.0
+metadata:
+  name: codewind-che
 projects:
   - name: goproj
     source:
@@ -40,10 +41,10 @@ components:
   - alias: exec-plugin
     type: chePlugin
     id: eclipse/che-machine-exec-plugin/0.0.1
-  - alias: codewind-plugin
+  - alias: codewind-sidecar
     type: chePlugin
-    id: <server>/plugins/codewind/codewind-plugin/0.0.1
+    id: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-sidecar/0.0.1/meta.yaml
   - alias: codewind-theia
     type: chePlugin
-    id: <server>/plugins/codewind/codewind-theia/0.0.1
+    id: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-theia/0.0.1/meta.yaml
 
