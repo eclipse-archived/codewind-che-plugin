@@ -24,7 +24,7 @@ firstPublicationDate: "2019-05-30"
 spec:
   containers:
   - name: codewind-che-sidecar
-    image: sys-mcs-docker-local.artifactory.swg-devops.com/codewind-che-sidecar
+    image: ibmcom/codewind-che-sidecar
     volumes:
       - mountPath: "/projects"
         name: projects
