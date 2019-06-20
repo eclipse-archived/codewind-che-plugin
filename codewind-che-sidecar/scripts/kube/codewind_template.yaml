@@ -13,7 +13,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: codewind-release-WORKSPACE_ID_PLACEHOLDER
+  name: codewind-WORKSPACE_ID_PLACEHOLDER
   labels:
     app: codewind-pfe
     workspace: WORKSPACE_ID_PLACEHOLDER
@@ -36,7 +36,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: codewind-release-WORKSPACE_ID_PLACEHOLDER
+  name: codewind-WORKSPACE_ID_PLACEHOLDER
   labels:
     app: codewind-pfe
     workspace: WORKSPACE_ID_PLACEHOLDER
@@ -110,8 +110,6 @@ spec:
             value: "WORKSPACE_ID_PLACEHOLDER"
           - name: PVC_NAME
             value: PVC_NAME_PLACEHOLDER
-          - name: FULL_NAME
-            value: codewind-release
           - name: LOADRUNNER_IMAGE
             value: ibmcom/microclimate-loadrunner:1903
           - name: LOADRUNNER_MEM_REQUEST
@@ -123,7 +121,7 @@ spec:
           - name: LOADRUNNER_CPU_LIMIT
             value: 1000m
           - name: SERVICE_NAME
-            value: codewind-release
+            value: codewind-WORKSPACE_ID_PLACEHOLDER
           - name: DOCKER_REGISTRY_SECRET
             value: "REGISTRY_SECRET_PLACEHOLDER"
           - name: DOCKER_REGISTRY_URL
