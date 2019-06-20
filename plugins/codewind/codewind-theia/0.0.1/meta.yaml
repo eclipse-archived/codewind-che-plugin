@@ -24,4 +24,4 @@ firstPublicationDate: "2019-05-30"
 latestUpdateDate: "2019-05-30"
 spec:
   extensions:
-    - <server>/codewind_plugin.vsix
+    - https://raw.githubusercontent.com/johnmcollier/devfiles/master/theia/codewind-0.2.0.vsix
