@@ -64,8 +64,8 @@ rules:
   resources: ["deployments"]
   verbs: ["watch", "get", "list", "create", "update", "delete"]
 
-- apiGroups: ["extensions"]
-  resources: ["replicasets"]
+- apiGroups: ["extensions", "apps"]
+  resources: ["replicasets", "replicasets/finalizers"]
   verbs: ["get", "list", "update", "delete"]
 
 - apiGroups: ["apiextensions.k8s.io"]
