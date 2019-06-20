@@ -53,6 +53,8 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
 
+RUN apk update && apk add jq 
+
 COPY scripts/ /scripts
 
 RUN chmod -R g+rwx /scripts && chown -R www-data:root /scripts
