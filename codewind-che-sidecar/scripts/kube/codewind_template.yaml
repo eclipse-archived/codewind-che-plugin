@@ -138,6 +138,8 @@ spec:
             value: "10"
           - name: HOST_WORKSPACE_DIRECTORY
             value: /projects
+          - name: CONTAINER_WORKSPACE_DIRECTORY
+            value: /codewind-workspace
           - name: EXTRA_GIT_OPTION
             value: ""
           - name: OWNER_REF_NAME
