@@ -16,7 +16,7 @@ metadata:
   name: codewind-WORKSPACE_ID_PLACEHOLDER
   labels:
     app: codewind-pfe
-    workspace: WORKSPACE_ID_PLACEHOLDER
+    pfeWorkspace: WORKSPACE_ID_PLACEHOLDER
   ownerReferences:
     - apiVersion: apps/v1
       blockOwnerDeletion: true
@@ -29,8 +29,7 @@ spec:
     - port: 9191
       name: portal-http
   selector:
-    app: codewind-pfe
-    workspace: WORKSPACE_ID_PLACEHOLDER
+    pfeWorkspace: WORKSPACE_ID_PLACEHOLDER
 
 ---
 
@@ -57,7 +56,7 @@ spec:
     metadata:
       labels:
         app: codewind-pfe
-        workspace: WORKSPACE_ID_PLACEHOLDER
+        pfeWorkspace: WORKSPACE_ID_PLACEHOLDER
       annotations:
         productName: "codewind"
         productID: "codewind"
