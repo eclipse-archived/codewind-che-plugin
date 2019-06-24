@@ -12,14 +12,9 @@
 # First use this layer to build the go version of filewatcherd
 FROM golang:1.12 as builder
 
-# Install Go dependencies
-RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-
 # Pull down any dependencies and build the filewatcher daemon go app
-WORKDIR /go/src/github.ibm.com/builder/Filewatcherd-Go/
+WORKDIR /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/
 COPY ./codewind-filewatchers/Filewatcherd-Go/src/codewind/ .
-RUN dep init
-RUN dep ensure -v
 RUN GOPATH= CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filewatcherd .
 
 # Build base image for the nginx based sidecar container
@@ -28,7 +23,7 @@ FROM nginx:stable-alpine
 RUN apk --no-cache add curl openssl
 
 WORKDIR /usr/local/bin
-COPY --from=builder /go/src/github.ibm.com/builder/Filewatcherd-Go/filewatcherd .
+COPY --from=builder /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/filewatcherd .
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./site.conf /etc/nginx/conf.d-default/default.conf
