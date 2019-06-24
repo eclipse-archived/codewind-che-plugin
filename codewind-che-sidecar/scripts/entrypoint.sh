@@ -37,7 +37,7 @@ if [ $? -ne 0 ]; then
     kubectl get svc
 fi
 
-CWServiceName=$(kubectl get svc --selector=app=codewind-pfe,workspace=$CHE_WORKSPACE_ID -o jsonpath="{.items[0].metadata.name}" 2> /dev/null)
+CWServiceName=$(kubectl get svc --selector=app=codewind-pfe,pfeWorkspace=$CHE_WORKSPACE_ID -o jsonpath="{.items[0].metadata.name}" 2> /dev/null)
 if [ -z $CWServiceName ]; then
     echo "ERROR: The Codewind service was not found. Aborting..."
     exit 1
