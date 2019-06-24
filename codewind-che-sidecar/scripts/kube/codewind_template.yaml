@@ -30,6 +30,7 @@ spec:
       name: portal-http
   selector:
     app: codewind-pfe
+    workspace: WORKSPACE_ID_PLACEHOLDER
 
 ---
 
