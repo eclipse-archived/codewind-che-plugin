@@ -85,7 +85,7 @@ spec:
           secretName: REGISTRY_SECRET_PLACEHOLDER
       containers:
       - name: codewind-pfe
-        image: sys-mcs-docker-local.artifactory.swg-devops.com/codewind-pfe-amd64:latest
+        image: ibmcom/codewind-pfe-amd64:0.2
         imagePullPolicy: "Always"
         securityContext:
           privileged: true
