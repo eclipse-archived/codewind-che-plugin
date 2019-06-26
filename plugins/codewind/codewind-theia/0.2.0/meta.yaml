@@ -12,7 +12,7 @@
 apiVersion: v2
 publisher: IBM
 name: codewind-plugin
-version: 0.
+version: 0.2.0
 type: VS Code extension
 displayName: Codewind VS Code Extension
 title: Codewind Extension for VS Code
