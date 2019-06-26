@@ -16,7 +16,7 @@ type: Che Plugin
 name: CodewindPlugin
 title: CodewindPlugin
 description: Enables iterative development and deployment in Che
-icon: https://raw.githubusercontent.com/IBM/charts/master/logo/microclimate-logo.png
+icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
 publisher: IBM
 repository: https://github.com/eclipse/codewind-che-plugin
 category: Other

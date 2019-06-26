@@ -17,7 +17,7 @@ type: VS Code extension
 displayName: Codewind VS Code Extension
 title: Codewind Extension for VS Code
 description: Codewind Extension for Theia
-icon: https://raw.githubusercontent.com/IBM/charts/master/logo/microclimate-logo.png
+icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
 repository: http://github.com/eclipse/codewind-vscode/
 category: Other
 firstPublicationDate: "2019-05-30"
