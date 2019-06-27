@@ -20,7 +20,7 @@ function usage {
   	cat <<EOF
 Usage: ${me} [-<option letter> <option value>] [-h]
 Options:
-  -m  # Eclipse Che installation mode. Can be one of: helm, openshift, operator (defaults to ${INSTALL_MODE})
+  -m  # Eclipse Che installation mode. Can be one of: helm, os, operator (defaults to ${INSTALL_MODE})
   -i  # Ingress domain, of the form <public-ip>.nip.io. Optional if installing on OKD or OpenShift.
   -n  # Namespace to install Che into (defaults to ${CHE_NAMESPACE})
 EOF
@@ -63,13 +63,18 @@ if [[ "$INSTALL_MODE" == "operator" ]]; then
     # Deploy the Codewind CheCluster
     kubectl create -f ${BASE_DIR}/operator/codewind-checluster.yaml
 elif [[ "$INSTALL_MODE" == "os" ]]; then
+    # Allow containers in the Che namespace to run as privileged and root
+    echo "Setting privileged and anyuid SCCs for eclipse-che namespace"
+    oc adm policy add-scc-to-group privileged system:serviceaccounts:eclipse-che
+    oc adm policy add-scc-to-group anyuid system:serviceaccounts:eclipse-che
+
     # Install Che using the openshift deployment scripts
     git clone https://github.com/eclipse/che.git
     cd che/deploy/openshift
     
     echo 'os'
     # Deploy on OpenShift
-    ./deploy_che.sh
+    ./deploy_che.sh --image-che=eclipse/che-server:7.0.0-RC-2.0
 
     # Create the role binding
     kubectl apply -f ${BASE_DIR}/codewind-rolebinding.yaml -n eclipse-che
@@ -81,7 +86,7 @@ else
     fi
 
     # Clone the Che repositor, as that's where the Che helm chart resides
-    git clone https://github.com/eclipse/che.git
+    git clone -b 7.0.0-RC-2.x https://github.com/eclipse/che.git
     cd che/deploy/kubernetes/helm/che
 
     # Install Helm dependencies
@@ -89,6 +94,7 @@ else
 
     # Install Che helm chart
     helm upgrade --install che --namespace $CHE_NAMESPACE \
+        --set cheImage=eclipse/che-server:7.0.0-RC-2.0 \
         --set global.ingressDomain=$INGRESS_DOMAIN \
         --set global.cheWorkspacesNamespace=$CHE_NAMESPACE \
         --set global.cheWorkspaceClusterRole=eclipse-codewind \
