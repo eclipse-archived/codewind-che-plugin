@@ -37,7 +37,7 @@ projects:
 components:
   - alias: theia-ide
     type: cheEditor
-    id: eclipse/che-theia/next
+    id: eclipse/che-theia/7.0.0-rc-3.0
   - alias: exec-plugin
     type: chePlugin
     id: eclipse/che-machine-exec-plugin/0.0.1
