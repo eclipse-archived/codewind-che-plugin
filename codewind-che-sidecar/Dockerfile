@@ -20,10 +20,10 @@ RUN GOPATH= CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filewatch
 # Build base image for the nginx based sidecar container
 FROM nginx:stable-alpine
 
-RUN apk --no-cache add curl openssl
+RUN apk --no-cache add curl openssl jq
 
-WORKDIR /usr/local/bin
-COPY --from=builder /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/filewatcherd .
+# Copy the filewatcherd daemon over from the previous build stage
+COPY --from=builder /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/filewatcherd /usr/local/bin
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./site.conf /etc/nginx/conf.d-default/default.conf
@@ -47,8 +47,6 @@ RUN chmod g+rwx /var/run/nginx.pid && \
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
-
-RUN apk update && apk add jq 
 
 COPY scripts/ /scripts
 
