@@ -11,15 +11,12 @@
 #     IBM Corporation - initial API and implementation
 #*******************************************************************************
 
-# Builds the nginx sidecar image and packages the Che plugin archive
+# Builds the Codewind Che plugin sidecar container
 
-set -e
-set -u
+set -eu
 
 BLUE='\033[1;34m'
-RED='\031[1;34m'
 NC='\033[0m'
-DIR=$(cd "$(dirname "$0")"; pwd)
 
 SCRIPTS_DIR=$(cd "$(dirname "$0")"; pwd)
 BASE_DIR=$(dirname $SCRIPTS_DIR)
