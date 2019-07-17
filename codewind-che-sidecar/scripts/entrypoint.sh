@@ -25,19 +25,7 @@ openssl req -subj '/CN=localhost' -x509 -newkey rsa:4096 -nodes -keyout /etc/ngi
 # Discovery of codewind service in a multi-workspace per namespace scenario
 /scripts/kube/deployPFE.sh
 
-echo "Waiting for the Codewind deployment to come up..."
-kubectl wait --for=condition=ready pod -l app=codewind-pfe --timeout=300s > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    echo "Codewind is still unavailable. There may be a problem with the configuration."
-    echo "Deployment Status:"
-    kubectl get deploy
-    echo "Pod Status:"
-    kubectl get po
-    echo "Available Services"
-    kubectl get svc
-fi
-
-CWServiceName=$(kubectl get svc --selector=app=codewind-pfe,pfeWorkspace=$CHE_WORKSPACE_ID -o jsonpath="{.items[0].metadata.name}" 2> /dev/null)
+CWServiceName=codewind-$CHE_WORKSPACE_ID
 if [ -z $CWServiceName ]; then
     echo "ERROR: The Codewind service was not found. Aborting..."
     exit 1
