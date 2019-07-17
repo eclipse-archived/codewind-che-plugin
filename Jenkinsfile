@@ -1,7 +1,10 @@
 #!groovy​
 
 pipeline {
-    agent any 
+    agent {
+    	label "docker-build"
+	}
+	
 	options {
         timestamps()
         skipStagesAfterUnstable()
@@ -9,9 +12,6 @@ pipeline {
 
     stages {
     	stage('Build Docker image') {
-            agent {
-                label "docker-build"
-            }
             steps {
 				sh '''#!/usr/bin/env bash
 					echo "Starting build for Eclipse Codewind Che plugin..."
