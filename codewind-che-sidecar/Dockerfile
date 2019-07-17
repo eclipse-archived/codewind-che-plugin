@@ -17,13 +17,19 @@ WORKDIR /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/
 COPY ./codewind-filewatchers/Filewatcherd-Go/src/codewind/ .
 RUN GOPATH= CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filewatcherd .
 
+# Build the pfe-deploy utility
+WORKDIR /go/deploy-pfe
+COPY ./deploy-pfe/ .
+RUN CGO_ENABLED=0 go build -o deploy-pfe -ldflags="-s -w"
+
 # Build base image for the nginx based sidecar container
 FROM nginx:stable-alpine
 
 RUN apk --no-cache add curl openssl jq
 
-# Copy the filewatcherd daemon over from the previous build stage
+# Copy the filewatcherd daemon and deploy-pfe over from the previous build stage
 COPY --from=builder /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/filewatcherd /usr/local/bin
+COPY --from=builder /go/deploy-pfe/deploy-pfe /usr/local/bin
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./site.conf /etc/nginx/conf.d-default/default.conf
@@ -43,10 +49,6 @@ RUN chmod g+rwx /var/run/nginx.pid && \
   chmod -R g+rwx /var/cache/nginx && \
   chmod -R g+rwx /etc/nginx/conf.d && \
   chmod -R g+rwx /etc/nginx/conf.d-default
-
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
-    chmod +x ./kubectl && \
-    mv ./kubectl /usr/local/bin/kubectl
 
 COPY scripts/ /scripts
 
