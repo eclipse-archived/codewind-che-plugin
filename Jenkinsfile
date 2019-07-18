@@ -17,8 +17,7 @@ pipeline {
 					echo "Starting build for Eclipse Codewind Che plugin..."
 					sh './scripts/build.sh'
 					echo "Publishing docker images for Eclipse Codewind Che plugin..."
-					sh 'chmod +x ./scripts/publish.sh'
-					sh './scripts/publish.sh eclipse'
+					sh './script/publish.sh'
 				'''
             }
         }
