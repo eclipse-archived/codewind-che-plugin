@@ -16,6 +16,8 @@ pipeline {
 				sh '''#!/usr/bin/env bash
 					echo "Starting build for Eclipse Codewind Che plugin..."
 					sh './scripts/build.sh'
+					echo "Publishing docker images for Eclipse Codewind Che plugin..."
+					sh './scripts/publish.sh eclipse'
 				'''
             }
         }
