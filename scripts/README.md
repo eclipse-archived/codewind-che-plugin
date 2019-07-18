@@ -4,14 +4,73 @@
 
 Run the script build.sh to build the Codewind Che sidecar.
 
-### Creating a Che Codewind workspace
+### Tag and Push the Codewind plugin
 
-To create a Che Codewind workspace, write a dev file and host it publicly with the following references to the Che sidecar and the Theia plugin metadata
+1. Tag the sidecar:
+   ```
+   docker tag codewind-che-sidecar ${registry}/codewind-che-sidecar
+   ```
+
+2. Push the sidecar up to a registry:
+   ```
+   docker push ${registry}/codewind-che-sidecar
+   ```
+
+### Deploying a Custom Codewind Che sidecar
+
+1. If modifying the sidecar image, create a `meta.yaml` for the Codewind sidecar plugin, and host it publicly. Make sure to also set the container image to the image that you pushed up in the earlier step. For example:
 
 ```
----
-specVersion: 0.0.1
-name: codewind-plugin-env
+id: codewind-sidecar
+apiVersion: v2
+version: latest
+type: Che Plugin
+name: CodewindPlugin
+title: CodewindPlugin
+description: Enables iterative development and deployment in Che
+icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
+publisher: Eclipse
+repository: https://github.com/eclipse/codewind-che-plugin
+category: Other
+firstPublicationDate: "2019-05-30"
+latestUpdateDate: "2019-06-26"
+spec:
+  containers:
+  - name: codewind-che-sidecar
+    image: ${REGISTRY}/codewind-che-sidecar:latest
+    volumes:
+      - mountPath: "/projects"
+        name: projects
+    ports:
+      - exposedPort: 9090
+```
+
+2. If modifying the Codewind theia extension, create a `meta.yaml` for the Codewind theia extension, and host it publicly. Make sure to also link directly to your Theia extension:
+```
+apiVersion: v2
+publisher: Eclipse
+name: codewind-plugin
+version: latest
+type: VS Code extension
+displayName: Codewind VS Code Extension
+title: Codewind Extension for VS Code
+description: Codewind Extension for Theia
+icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
+repository: http://github.com/eclipse/codewind-vscode/
+category: Other
+firstPublicationDate: "2019-05-30"
+latestUpdateDate: "2019-06-26"
+spec:
+  extensions:
+    - ${SERVER}/codewind-theia-0.2.0.vsix
+```
+
+3. Finally, to create a Che Codewind workspace, write a dev file and host it publicly, making sure to set the links to the codewind-sidecar and codewind-theia meta.yamls as needed (link to your custom meta.yamls).
+
+```
+apiVersion: 1.0.0
+metadata:
+  name: codewind-che
 projects:
   - name: goproj
     source:
@@ -20,61 +79,13 @@ projects:
 components:
   - alias: theia-ide
     type: cheEditor
-    id: eclipse/che-theia/next
-  - alias: exec-plugin
+    id: eclipse/che-theia/7.0.0-rc-3.0
+  - alias: codewind-sidecar
     type: chePlugin
-    id: eclipse/che-machine-exec-plugin/0.0.1
-  - alias: codewind-plugin
-    type: chePlugin
-    id: {server}/plugins/codewind/codewind-plugin/0.0.1/meta.yaml
+    id: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-sidecar/latest/meta.yaml
   - alias: codewind-theia
     type: chePlugin
-    id: {server}/plugins/codewind/codewind-theia/0.0.1/meta.yaml
+    id: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-theia/latest/meta.yaml
 ```
-
-The `codewind-plugin` meta.yaml will provide the details of the Che sidecar. You must have built and pushed the sidecar image up to a docker registry
-
-```
-id: codewind-plugin
-apiVersion: v2
-version: 0.0.1
-type: Che Plugin
-name: codewind-plugin
-title: codewind-plugin
-description: Enables iterative development and deployment in Che
-icon: https://raw.githubusercontent.com/IBM/charts/master/logo/microclimate-logo.png
-publisher: IBM
-category: Other
-repository: {server}/plugins/codewind/codewind-plugin
-firstPublicationDate: "2019-02-20"
-spec:
-  containers:
-  - name: codewind-che-sidecar
-    image: {REGISTRY_URL}/codewind-che-sidecar
-    volumes:
-      - mountPath: "/projects"
-        name: projects
-    ports:
-      - exposedPort: 9090
-```
-
-The `codewind-theia` meta.yaml will provide the details to the Theia plugin, where the `codewind_plugin.theia` is hosted
-
-```
-apiVersion: v2
-publisher: IBM
-name: codewind-plugin
-version: 0.0.1
-type: Theia plugin
-displayName: Codewind Theia Plugin
-title: Codewind Plugin for Theia
-description: Codewind Plugin for Theia
-icon: https://raw.githubusercontent.com/vitaliy-guliy/che-theia-plugin-registry/master/icons/tree.png
-repository: https://github.com/eclipse/che-theia-samples/tree/master/samples/hello-world-frontend-plugin
-category: Other
-firstPublicationDate: "2019-03-13"
-latestUpdateDate: "2019-04-09"
-spec:
-  extensions:
-    - {server}/plugins/codewind/codewind-theia/0.0.1/codewind_plugin.theia
-```
+  
+  Then create the workspace in Che by accessing http://$CHE_DOMAIN/f?url=${DEVFILE_LINK} in your browser, where ${DEVFILE_LINK} is the direct link to the devfile you created.

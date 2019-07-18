@@ -60,7 +60,7 @@ spec:
       annotations:
         productName: "codewind"
         productID: "codewind"
-        productVersion: "19.05"
+        productVersion: "0.2.0"
 
     spec:
       serviceAccountName: SERVICE_ACCOUNT_PLACEHOLDER
@@ -73,7 +73,6 @@ spec:
                   operator: In
                   values:
                   - amd64
-                  - ppc64le
       volumes:
       - name: shared-workspace
         persistentVolumeClaim:
@@ -83,6 +82,7 @@ spec:
         secret:
           defaultMode: 0777
           secretName: REGISTRY_SECRET_PLACEHOLDER
+          optional: true
       containers:
       - name: codewind-pfe
         image: sys-mcs-docker-local.artifactory.swg-devops.com/codewind-pfe-amd64:latest
@@ -110,32 +110,14 @@ spec:
             value: "WORKSPACE_ID_PLACEHOLDER"
           - name: PVC_NAME
             value: PVC_NAME_PLACEHOLDER
-          - name: LOADRUNNER_IMAGE
-            value: ibmcom/microclimate-loadrunner:1903
-          - name: LOADRUNNER_MEM_REQUEST
-            value: 128Mi
-          - name: LOADRUNNER_CPU_REQUEST
-            value: 100m
-          - name: LOADRUNNER_MEM_LIMIT
-            value: 2Gi
-          - name: LOADRUNNER_CPU_LIMIT
-            value: 1000m
           - name: SERVICE_NAME
             value: codewind-WORKSPACE_ID_PLACEHOLDER
           - name: DOCKER_REGISTRY_SECRET
             value: "REGISTRY_SECRET_PLACEHOLDER"
-          - name: DOCKER_REGISTRY_URL
-            value: "DOCKER_REGISTRY_PLACEHOLDER"
-          - name: HELM_SECRET
-            value: "microclimate-helm-secret"
           - name: SERVICE_ACCOUNT_NAME
             value: SERVICE_ACCOUNT_PLACEHOLDER
-          - name: MICROCLIMATE_VERSION
-            value: "19.01"
           - name: MICROCLIMATE_RELEASE_NAME
             value: RELEASE-NAME
-          - name: OIDC_CLOCK_TOLERANCE
-            value: "10"
           - name: HOST_WORKSPACE_DIRECTORY
             value: /projects
           - name: CONTAINER_WORKSPACE_DIRECTORY
