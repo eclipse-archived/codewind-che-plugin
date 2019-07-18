@@ -22,11 +22,13 @@ pipeline {
         
         stage('Publish Docker image') {
             steps {
+            	withDockerRegistry([credentialsId: 'docker.com-bot']) {
 				sh '''#!/usr/bin/env bash
 					echo "Publishing docker images for Eclipse Codewind Che Sidecar..."
 					./scripts/publish.sh eclipse
-				'''
-            }
+			    '''
+			    }
+			}
         }
     }
 }
