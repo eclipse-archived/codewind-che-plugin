@@ -58,7 +58,7 @@ rules:
 
 - apiGroups: ["extensions"]
   resources: ["ingresses"]
-  verbs: ["get", "patch"]
+  verbs: ["get", "list", "create", "delete", "watch"]
 
 - apiGroups: ["apps", "extensions"]
   resources: ["deployments"]
@@ -91,3 +91,7 @@ rules:
 - apiGroups: [""]
   resources: ["events"]
   verbs: ["create", "patch", "update"]
+
+- apiGroups: ["route.openshift.io"]
+  resources: ["routes"]
+  verbs: ["get", "list", "create", "delete", "watch"]
