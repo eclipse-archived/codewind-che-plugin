@@ -9,9 +9,9 @@ Run the script build.sh to build the Codewind Che sidecar.
 1. First, run the publish script located in this repository: `scripts/publish.sh $REGISTRY`, where `$REGISTRY` is a docker registry that you can push to, such as `docker.io/testuser` or `quay.io/testuser`.
     - The script will push the sidecar image up to the registry, and then generate the meta.yamls for `codewind-sidecar` and `codewind-theia` under the `publish/` folder.
 
-2. Upload the meta.yamls somewhere publicly accessible, such as a Github repository. 
+2. Upload the meta.yamls somewhere publicly accessible, such as a GitHub repository.
 
-3. Finally, to create a Che Codewind workspace, write a dev file and host it publicly, such as on Github. Make sure to set the URLs for `codewind-sidecar` and `codewind-theia` accordingly
+3. Finally, to create a Che Codewind workspace, write a dev file and host it publicly, such as on Github. Make sure to set the URLs for `codewind-sidecar` and `codewind-theia` accordingly. If hosting the devfiles or plugins on GitHub, make sure you use the raw Github link (such as https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml)
 
 ```
 apiVersion: 1.0.0
