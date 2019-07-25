@@ -10,4 +10,4 @@ Pull Request Policy: https://wiki.eclipse.org/Codewind_GitHub_Workflows#Making_a
 
 
 ### Does this PR require updates to the docs?
-Please add a matching PR to [the docs repo](https://github.com/eclipse/codewind-docs) for doc updates and link that PR to this issue.
+Add a matching PR to [the docs repo](https://github.com/eclipse/codewind-docs) for doc updates and link that PR to this issue.
