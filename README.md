@@ -32,6 +32,8 @@ To build the sidecar image, run `./build.sh`.
 For deployment instructions, see the README.md file at [eclipse/codewind-che-plugin](https://github.com/eclipse/codewind-che-plugin/tree/master/scripts).
 
 ## Contributing
+We use the main Codewind git repo (https://github.com/eclipse/codewind) for issue tracking.
+
 Submit issues and contributions:
-1. [Submitting issues](https://github.com/eclipse/codewind-che-plugin/issues)
+1. [Submitting issues](https://github.com/eclipse/codewind/issues)
 2. [Contributing](CONTRIBUTING.md)
