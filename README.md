@@ -16,6 +16,9 @@ The Codewind sidecar container includes the following responsibilities:
     - The `filewatcherd` daemon watches for changes in each user's project and communicates with Codewind, letting it know to start a build if required.
     - For more information on `filewatcherd`, see [eclipse/codewind-filewatchers](https://github.com/eclipse/codewind-filewatchers).
 
+## Installing Codewind on Eclipse Che
+
+To install Codewind on Eclipse Che, please consult [Installing and Using Codewind on Kubernetes](https://www.eclipse.org/codewind/installoncloud.html)
 
 ## Developing
 
@@ -29,7 +32,7 @@ To build the sidecar image, run `./build.sh`.
 
 ### Deploying
 
-For deployment instructions, see the README.md file at [eclipse/codewind-che-plugin](https://github.com/eclipse/codewind-che-plugin/tree/master/scripts).
+For instructions on deploying custom builds of the Codewind Che plugin, see the README.md file at [eclipse/codewind-che-plugin/scripts](https://github.com/eclipse/codewind-che-plugin/tree/master/scripts).
 
 ## Contributing
 We use the main Codewind git repo (https://github.com/eclipse/codewind) for issue tracking.
