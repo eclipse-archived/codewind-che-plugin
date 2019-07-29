@@ -10,7 +10,7 @@
 ################################################################################
 
 apiVersion: v2
-publisher: IBM
+publisher: eclipse
 name: codewind-plugin
 version: latest
 type: VS Code extension
@@ -24,4 +24,4 @@ firstPublicationDate: "2019-05-30"
 latestUpdateDate: "2019-06-26"
 spec:
   extensions:
-    - http://download.eclipse.org/codewind/milestone/0.2.0/codewind-theia-0.2.0.vsix
+    - http://download.eclipse.org/codewind/codewind-vscode/master/latest/codewind-theia.vsix

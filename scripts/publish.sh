@@ -58,7 +58,7 @@ EOF
 mkdir -p $BASE_DIR/publish/codewind-theia/latest
 cat <<EOF > publish/codewind-theia/latest/meta.yaml
 apiVersion: v2
-publisher: Eclipse
+publisher: eclipse
 name: codewind-plugin
 version: latest
 type: VS Code extension
@@ -72,7 +72,7 @@ firstPublicationDate: "2019-05-30"
 latestUpdateDate: "$(date '+%Y-%m-%d')"
 spec:
   extensions:
-    - http://download.eclipse.org/codewind/milestone/0.2.0/codewind-theia-0.2.0.vsix
+    - http://download.eclipse.org/codewind/codewind-vscode/master/latest/codewind-theia.vsix
 
 EOF
 
