@@ -106,5 +106,27 @@ function setCodewindOwner() {
     OWNER_REFERENCE_NAME=$( kubectl get po --selector=che.original_name=che-workspace-pod,che.workspace_id=$CHE_WORKSPACE_ID -o jsonpath='{.items[0].metadata.ownerReferences[0].name}' )
     OWNER_REFERENCE_UID=$( kubectl get po --selector=che.original_name=che-workspace-pod,che.workspace_id=$CHE_WORKSPACE_ID -o jsonpath='{.items[0].metadata.ownerReferences[0].uid}' )
     setTemplateValue $DEPLOY_DIR/codewind.yaml OWNER_REFERENCE_NAME_PLACEHOLDER $OWNER_REFERENCE_NAME
+    setTemplateValue $DEPLOY_DIR/codewind_ingress.yaml OWNER_REFERENCE_NAME_PLACEHOLDER $OWNER_REFERENCE_NAME
     setTemplateValue $DEPLOY_DIR/codewind.yaml OWNER_REFERENCE_UID_PLACEHOLDER $OWNER_REFERENCE_UID
+    setTemplateValue $DEPLOY_DIR/codewind_ingress.yaml OWNER_REFERENCE_UID_PLACEHOLDER $OWNER_REFERENCE_UID
+}
+
+function setCodewindIngress() {
+    # Get the CHE_API url and extract the hostname component
+    CHE_INGRESS_HOST=$(echo $CHE_API | sed -e 's#http[s]*://##') # remove protocol
+    CHE_INGRESS_HOST=$(echo $CHE_INGRESS_HOST | sed -e 's#/.*##') # remove path
+
+    setTemplateValue $DEPLOY_DIR/codewind.yaml CHE_INGRESS_HOST_PLACEHOLDER $CHE_INGRESS_HOST
+    setTemplateValue $DEPLOY_DIR/codewind_ingress.yaml CHE_INGRESS_HOST_PLACEHOLDER $CHE_INGRESS_HOST
+}
+
+# If running on OCP use the Codewind route template instead of the Codewind ingress template
+function copyIngressTemplate() {
+    cp -rf $SCRIPTS_DIR/kube/codewind_ingress_template.yaml $DEPLOY_DIR/codewind_ingress.yaml
+    echo "Checking for any OCP routes"
+    kubectl get routes
+    if [[ $? == 0 ]]; then
+        echo "Running on OCP - using Codewind route template instead of Codewind ingress template"
+        cp -rf $SCRIPTS_DIR/kube/codewind_route_template.yaml $DEPLOY_DIR/codewind_ingress.yaml
+    fi
 }
