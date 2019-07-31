@@ -6,7 +6,7 @@ pipeline {
     }
 
     triggers {
-      issueCommentTrigger('.*trigger build.*')
+      issueCommentTrigger('trigger_build')
     }
 	
     options {
