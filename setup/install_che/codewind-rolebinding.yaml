@@ -8,12 +8,13 @@
 # Contributors:
 #     IBM Corporation - initial API and implementation
 #*******************************************************************************
-kind: RoleBinding
+kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: codewind-rolebinding
 subjects:
 - kind: ServiceAccount
+  namespace: eclipse-che
   name: che-workspace
 roleRef:
   kind: ClusterRole
