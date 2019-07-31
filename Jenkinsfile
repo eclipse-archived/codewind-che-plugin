@@ -4,6 +4,10 @@ pipeline {
     agent {
     	label "docker-build"
     }
+
+    triggers {
+      issueCommentTrigger('.*trigger build.*')
+    }
 	
     options {
         timestamps()
