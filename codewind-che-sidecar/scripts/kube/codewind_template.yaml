@@ -85,7 +85,7 @@ spec:
           optional: true
       containers:
       - name: codewind-pfe
-        image: eclipse/codewind-pfe-amd64:latest
+        image: tobespc/codewind-pfe-amd64:latest
         imagePullPolicy: "Always"
         securityContext:
           privileged: true
@@ -98,6 +98,8 @@ spec:
         - name: registry-secret
           mountPath: "/tmp/secret"
         env:
+          - name: TEKTON_PIPELINE
+            value: tekton-pipelines
           - name: IN_K8
             value: "true"
           - name: PORTAL_HTTPS
