@@ -98,6 +98,8 @@ spec:
         - name: registry-secret
           mountPath: "/tmp/secret"
         env:
+          - name: TEKTON_PIPELINE
+            value: tekton-pipelines
           - name: IN_K8
             value: "true"
           - name: PORTAL_HTTPS
