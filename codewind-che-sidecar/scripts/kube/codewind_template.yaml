@@ -85,7 +85,7 @@ spec:
           optional: true
       containers:
       - name: codewind-pfe
-        image: tobespc/codewind-pfe-amd64:latest
+        image: eclipse/codewind-pfe-amd64:latest
         imagePullPolicy: "Always"
         securityContext:
           privileged: true
