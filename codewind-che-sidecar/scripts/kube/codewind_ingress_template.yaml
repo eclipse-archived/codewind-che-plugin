@@ -1,0 +1,34 @@
+################################################################################
+# Copyright (c) 2019 IBM Corporation and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v2.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v20.html
+#
+# Contributors:
+#     IBM Corporation - initial API and implementation
+################################################################################
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: codewind-ingress-WORKSPACE_ID_PLACEHOLDER
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: OWNER_REFERENCE_NAME_PLACEHOLDER
+      uid: OWNER_REFERENCE_UID_PLACEHOLDER
+spec:
+  rules:
+  - host: codewind-WORKSPACE_ID_PLACEHOLDER-CHE_INGRESS_HOST_PLACEHOLDER
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: codewind-WORKSPACE_ID_PLACEHOLDER
+          servicePort: 9191
