@@ -28,7 +28,7 @@ pipeline {
                             echo "Publishing docker images for Eclipse Codewind Che Sidecar..."
                             ./scripts/publish.sh eclipse
                         else
-                                echo "Skip publishing docker images for the PR build"
+                            echo "Skip publishing docker images for the PR build"
                         fi
                     '''
                 }
