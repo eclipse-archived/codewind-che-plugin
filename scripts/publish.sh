@@ -29,7 +29,8 @@ else
     TAG=$2
 fi
 
-BASE_DIR=$(dirname pwd)
+SCRIPTS_DIR="$(dirname $0)"
+BASE_DIR="$(dirname $SCRIPTS_DIR)"
 
 docker tag codewind-che-sidecar $REGISTRY/codewind-che-sidecar:$TAG
 docker push $REGISTRY/codewind-che-sidecar:$TAG
