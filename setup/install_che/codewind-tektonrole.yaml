@@ -15,6 +15,6 @@ metadata:
   name: codewind-tekton
 rules:
 - apiGroups: ["extensions"]
-  resources: ["ingresses"]
-  verbs: ["get"]
+  resources: ["ingresses", "ingresses/status"]
+  verbs: ["delete", "create", "patch", "get", "list", "update", "watch", "use"]
 
