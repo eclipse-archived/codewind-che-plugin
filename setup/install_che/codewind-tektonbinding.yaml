@@ -14,7 +14,6 @@ metadata:
   name: codewind-tektonbinding
 subjects:
 - kind: ServiceAccount
-  namespace: eclipse-che
   name: che-workspace
 roleRef:
   kind: ClusterRole
