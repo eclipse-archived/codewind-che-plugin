@@ -41,7 +41,8 @@ components:
 ```
   
   Then create the workspace in Che by accessing `http://$CHE_DOMAIN/f?url=${DEVFILE_LINK}` in your browser, where `${DEVFILE_LINK}` is the direct link to the devfile you created. Che will then create a workspace from that devfile.
-  - An example of such a link is: http://che-eclipse-che.1.2.3.4.nip.io/f?url=https://github.com/eclipse/codewind-che-plugin/blob/master/devfiles/latest/devfile.yaml
+  - An example of such a link is: http://che-eclipse-che.1.2.3.4.nip.io/f?url=https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml
+  - If hosting the Devfile on Github, make sure to use its raw link (such as https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml)
 
 
       
