@@ -2,6 +2,7 @@
 Use the Eclipse Codewind sidecar plug-in for Eclipse Che to enable Theia to communicate with the Codewind server container.
 
 [![License](https://img.shields.io/badge/License-EPL%202.0-red.svg?label=license&logo=eclipse)](https://www.eclipse.org/legal/epl-2.0/)
+[![Build Status](https://ci.eclipse.org/codewind/buildStatus/icon?job=Codewind%2Fcodewind-che-plugin%2Fmaster)](https://ci.eclipse.org/codewind/job/Codewind/job/codewind-che-plugin/job/master/)
 [![Chat](https://img.shields.io/static/v1.svg?label=chat&message=mattermost&color=145dbf)](https://mattermost.eclipse.org/eclipse/channels/eclipse-codewind)
 
 ## What is the Eclipse Codewind sidecar container?
@@ -32,7 +33,7 @@ To build the sidecar image, run `./build.sh`.
 
 ### Deploying
 
-For instructions on deploying custom builds of the Codewind Che plugin, see the README.md file at [eclipse/codewind-che-plugin/scripts](https://github.com/eclipse/codewind-che-plugin/tree/master/scripts).
+For instructions on deploying custom builds of the Codewind Che plugin, consult DEVELOPING.md
 
 ## Contributing
 We use the main Codewind git repo (https://github.com/eclipse/codewind) for issue tracking.

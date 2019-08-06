@@ -98,6 +98,8 @@ spec:
         - name: registry-secret
           mountPath: "/tmp/secret"
         env:
+          - name: TEKTON_PIPELINE
+            value: tekton-pipelines
           - name: IN_K8
             value: "true"
           - name: PORTAL_HTTPS
@@ -128,6 +130,10 @@ spec:
             value: OWNER_REFERENCE_NAME_PLACEHOLDER
           - name: OWNER_REF_UID
             value: OWNER_REFERENCE_UID_PLACEHOLDER
+          - name: CODEWIND_PERFORMANCE_SERVICE  
+            value: codewind-performance-WORKSPACE_ID_PLACEHOLDER
+          - name: CHE_INGRESS_HOST
+            value: CHE_INGRESS_HOST_PLACEHOLDER
         ports:
         - containerPort: 9191
         resources:
@@ -137,3 +143,91 @@ spec:
           limits:
             memory: 2Gi
             cpu: 500m
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codewind-performance-WORKSPACE_ID_PLACEHOLDER
+  labels:
+    app: codewind-performance
+    performanceWorkspace: WORKSPACE_ID_PLACEHOLDER
+  ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: OWNER_REFERENCE_NAME_PLACEHOLDER
+      uid: OWNER_REFERENCE_UID_PLACEHOLDER
+spec:
+  ports:
+    - port: 9095
+      name: performance-http
+  selector:
+    performanceWorkspace: WORKSPACE_ID_PLACEHOLDER
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: codewind-performance-WORKSPACE_ID_PLACEHOLDER
+  labels:
+    app: codewind-performance
+    workspace: WORKSPACE_ID_PLACEHOLDER
+  ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: OWNER_REFERENCE_NAME_PLACEHOLDER
+      uid: OWNER_REFERENCE_UID_PLACEHOLDER
+spec:
+  selector:
+    matchLabels:
+      app: codewind-performance
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: codewind-performance
+        performanceWorkspace: WORKSPACE_ID_PLACEHOLDER
+      annotations:
+        productName: "codewind-performance"
+        productID: "codewind-performance"
+    spec:
+      serviceAccountName: SERVICE_ACCOUNT_PLACEHOLDER
+      affinity:        
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: beta.kubernetes.io/arch
+                  operator: In
+                  values:
+                  - amd64
+                  - ppc64le
+      containers:
+      - name: codewind-performance
+        image: eclipse/codewind-performance-amd64:latest
+        imagePullPolicy: "Always"
+        securityContext:
+          privileged: true
+        env:
+          - name: IN_K8
+            value: "true"
+          - name: PORTAL_HTTPS
+            value: "false"
+          - name: CODEWIND_INGRESS
+            value: codewind-WORKSPACE_ID_PLACEHOLDER-CHE_INGRESS_HOST_PLACEHOLDER
+        ports:
+        - containerPort: 9095
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 100m
+          limits:
+            memory: 2Gi
+            cpu: 500m
+            

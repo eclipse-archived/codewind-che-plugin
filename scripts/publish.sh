@@ -13,25 +13,34 @@
 
 # Pushes the Nginx sidecar image up to the specified registry
 
-set -eu
+set -e
 
-if [ "$#" -ne 1 ]; then
-    echo "usage: $0 <registry-to-push-sidecar-to>"
+if [ "$#" -lt 1 ]; then
+    echo "usage: $0 <registry-to-push-sidecar-to> <image-tag>"
     exit 1
 fi
 
 REGISTRY=$1
-BASE_DIR=$(dirname pwd)
 
-docker tag codewind-che-sidecar $REGISTRY/codewind-che-sidecar
-docker push $REGISTRY/codewind-che-sidecar
+# Set the image tag
+if [ -z "$2" ]; then
+    TAG=latest
+else
+    TAG=$2
+fi
+
+SCRIPTS_DIR="$(dirname $0)"
+BASE_DIR="$(dirname $SCRIPTS_DIR)"
+
+docker tag codewind-che-sidecar $REGISTRY/codewind-che-sidecar:$TAG
+docker push $REGISTRY/codewind-che-sidecar:$TAG
 
 # Create the meta.yaml for the Sidecar container
-mkdir -p $BASE_DIR/publish/codewind-sidecar/latest
-cat <<EOF > publish/codewind-sidecar/latest/meta.yaml
+mkdir -p $BASE_DIR/publish/codewind-sidecar/$TAG
+cat <<EOF > publish/codewind-sidecar/$TAG/meta.yaml
 id: codewind-sidecar
 apiVersion: v2
-version: latest
+version: $TAG
 type: Che Plugin
 name: CodewindPlugin
 title: CodewindPlugin
@@ -45,7 +54,7 @@ latestUpdateDate: "$(date '+%Y-%m-%d')"
 spec:
   containers:
   - name: codewind-che-sidecar
-    image: $REGISTRY/codewind-che-sidecar:latest
+    image: $REGISTRY/codewind-che-sidecar:$TAG
     volumes:
       - mountPath: "/projects"
         name: projects
@@ -55,12 +64,12 @@ spec:
 EOF
 
 # Create the meta.yaml for the Theia extension
-mkdir -p $BASE_DIR/publish/codewind-theia/latest
-cat <<EOF > publish/codewind-theia/latest/meta.yaml
+mkdir -p $BASE_DIR/publish/codewind-theia/$TAG
+cat <<EOF > publish/codewind-theia/$TAG/meta.yaml
 apiVersion: v2
 publisher: eclipse
 name: codewind-plugin
-version: latest
+version: $TAG
 type: VS Code extension
 displayName: Codewind VS Code Extension
 title: Codewind Extension for VS Code

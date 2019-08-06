@@ -1,5 +1,10 @@
 ## Building & Using the Codewind Plugin on Che
 
+### Set the Codewind container image
+
+If deploying a custom image of Codewind from https://github.com/eclipse/codewind, make sure to set https://github.com/eclipse/codewind-che-plugin/blob/master/codewind-che-sidecar/scripts/kube/codewind_template.yaml#L88 to point to your tagged and pushed `codewind-pfe-amd64` docker image.
+ - Otherwise, leave it as `eclipse/codewind-pfe-amd64:latest`
+
 ### Build the Codewind plugin
 
 Run the script build.sh to build the Codewind Che sidecar.
@@ -11,7 +16,8 @@ Run the script build.sh to build the Codewind Che sidecar.
 
 2. Upload the meta.yamls somewhere publicly accessible, such as a GitHub repository.
 
-3. Finally, to create a Che Codewind workspace, write a dev file and host it publicly, such as on Github. Make sure to set the URLs for `codewind-sidecar` and `codewind-theia` accordingly. If hosting the plugin meta.yamls on GitHub, make sure you use the raw Github link (such as https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-sidecar/latest/meta.yaml)
+3. Finally, to create a Che Codewind workspace, write a devfile and host it publicly, such as on Github. Make sure to set the URLs for `codewind-sidecar` and `codewind-theia` accordingly. If hosting the plugin meta.yamls on GitHub, make sure you use the raw Github link
+    - Such as https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-sidecar/latest/meta.yaml
 
 ```
 apiVersion: 1.0.0
@@ -34,8 +40,9 @@ components:
     id: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-theia/latest/meta.yaml
 ```
   
-  Then create the workspace in Che by accessing http://$CHE_DOMAIN/f?url=${DEVFILE_LINK} in your browser, where `${DEVFILE_LINK}` is the direct link to the devfile you created. If the devfile is hosted on Github, make sure you use the raw Github link (such as https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml) Che will then create a workspace from that devfile.
+  Then create the workspace in Che by accessing `http://$CHE_DOMAIN/f?url=${DEVFILE_LINK}` in your browser, where `${DEVFILE_LINK}` is the direct link to the devfile you created. Che will then create a workspace from that devfile.
   - An example of such a link is: http://che-eclipse-che.1.2.3.4.nip.io/f?url=https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml
+  - If hosting the Devfile on Github, make sure to use its raw link (such as https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml)
 
 
       

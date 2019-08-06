@@ -17,6 +17,7 @@ source /scripts/kube/deployUtils.sh
 # Create a folder to render the Codewind template in
 mkdir -p $DEPLOY_DIR
 cp -rf $SCRIPTS_DIR/kube/codewind_template.yaml $DEPLOY_DIR/codewind.yaml
+copyIngressTemplate
 
 ## touch a deploy messages json file
 echo '{}' >$DEPLOY_STATUS_FILE
@@ -28,6 +29,7 @@ setCodewindServiceAccount
 
 # Set the subpath for the projects volume mount. Che uses /projects/$CHE_WORKSPACE_ID as the format
 setTemplateValue $DEPLOY_DIR/codewind.yaml WORKSPACE_ID_PLACEHOLDER $CHE_WORKSPACE_ID
+setTemplateValue $DEPLOY_DIR/codewind_ingress.yaml WORKSPACE_ID_PLACEHOLDER $CHE_WORKSPACE_ID
 
 # Set the namespace to deploy Codewind under. Needs to be the same namespace as the Che workspace it's assocaited with
 NAMESPACE=$( kubectl get po --selector=che.original_name=che-workspace-pod -o jsonpath='{.items[0].metadata.namespace}' )
@@ -35,6 +37,9 @@ setTemplateValue $DEPLOY_DIR/codewind.yaml KUBE_NAMESPACE_PLACEHOLDER $NAMESPACE
 
 # Set the owner the Codewind deployment and service
 setCodewindOwner
+
+# Set the ingress for Codewind
+setCodewindIngress
 
 # Check if we're on IBM Cloud Private and if so, apply the ibm-privileged-psp
 kubectl get images.icp.ibm.com
@@ -50,3 +55,6 @@ fi
 # Deploy Codewind
 echo "Creating the Codewind deployment and service"
 kubectl apply -f $DEPLOY_DIR/codewind.yaml
+
+echo "Applying Codewind Ingress"
+kubectl apply -f $DEPLOY_DIR/codewind_ingress.yaml

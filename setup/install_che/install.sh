@@ -44,6 +44,7 @@ fi
 
 # Create the cluster role needed for Codewind
 kubectl apply -f ${BASE_DIR}/codewind-clusterrole.yaml
+kubectl apply -f ${BASE_DIR}/codewind-tektonrole.yaml
 
 if [[ "$INSTALL_MODE" == "operator" ]]; then
     # Install Che via the operator
@@ -78,6 +79,7 @@ elif [[ "$INSTALL_MODE" == "os" ]]; then
 
     # Create the role binding
     kubectl apply -f ${BASE_DIR}/codewind-rolebinding.yaml -n eclipse-che
+    kubectl apply -f ${BASE_DIR}/codewind-tektonbinding.yaml -n eclipse-che
 else
     # Deploy using the Helm chart
     if [[ -z "$INGRESS_DOMAIN" ]]; then
@@ -102,4 +104,5 @@ else
         --set che.workspace.pluginRegistryUrl="https://che-plugin-registry.openshift.io/v3" ./
     
     kubectl apply -f ${BASE_DIR}/codewind-rolebinding.yaml -n $CHE_NAMESPACE
+    kubectl apply -f ${BASE_DIR}/codewind-tektonbinding.yaml -n $CHE_NAMESPACE
 fi

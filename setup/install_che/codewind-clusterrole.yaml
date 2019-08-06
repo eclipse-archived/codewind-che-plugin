@@ -56,10 +56,6 @@ rules:
   resources: ["images"]
   verbs: ["get", "list", "create", "watch"]
 
-- apiGroups: ["extensions"]
-  resources: ["ingresses"]
-  verbs: ["get", "list", "create", "delete", "watch"]
-
 - apiGroups: ["apps", "extensions"]
   resources: ["deployments"]
   verbs: ["watch", "get", "list", "create", "update", "delete"]
@@ -93,5 +89,5 @@ rules:
   verbs: ["create", "patch", "update"]
 
 - apiGroups: ["route.openshift.io"]
-  resources: ["routes"]
-  verbs: ["get", "list", "create", "delete", "watch"]
+  resources: ["routes", "routes/custom-host"]
+  verbs: ["get", "list", "create", "delete", "watch", "patch", "update"]
