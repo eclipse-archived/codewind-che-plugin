@@ -20,7 +20,7 @@ RUN GOPATH= CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filewatch
 # Build the pfe-deploy utility
 WORKDIR /go/deploy-pfe
 COPY ./deploy-pfe/ .
-RUN CGO_ENABLED=0 go build -o deploy-pfe -ldflags="-s -w"
+RUN make && make test
 
 # Build base image for the nginx based sidecar container
 FROM nginx:stable-alpine
