@@ -23,13 +23,9 @@ cp /etc/nginx/conf.d-default/default.conf /etc/nginx/conf.d/default.conf
 openssl req -subj '/CN=localhost' -x509 -newkey rsa:4096 -nodes -keyout /etc/nginx/conf.d/key.pem -out /etc/nginx/conf.d/cert.pem -days 1825
 
 # Discovery of codewind service in a multi-workspace per namespace scenario
-/scripts/kube/deployPFE.sh
+deploy-pfe
 
 CWServiceName=codewind-$CHE_WORKSPACE_ID
-if [ -z $CWServiceName ]; then
-    echo "ERROR: The Codewind service was not found. Aborting..."
-    exit 1
-fi
 
 echo "Codewind is now ready."
 echo "Setting proxy to Codewind service: $CWServiceName"
