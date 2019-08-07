@@ -41,3 +41,4 @@ We use the main Codewind git repo (https://github.com/eclipse/codewind) for issu
 Submit issues and contributions:
 1. [Submitting issues](https://github.com/eclipse/codewind/issues)
 2. [Contributing](CONTRIBUTING.md)
+ 
