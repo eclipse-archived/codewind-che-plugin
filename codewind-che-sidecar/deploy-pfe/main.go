@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	//"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 
@@ -10,7 +12,9 @@ import (
 
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"k8s.io/client-go/kubernetes"
+
 	"k8s.io/client-go/rest"
+	//"k8s.io/client-go/tools/clientcmd"
 )
 
 func main() {
@@ -31,14 +35,18 @@ func main() {
 
 	// Get the current namespace
 	namespace := che.GetCurrentNamespace()
-	log.Infof("Namespace: %s\n", namespace)
 
 	// Get the Che workspace ID
 	cheWorkspaceID := os.Getenv("CHE_WORKSPACE_ID")
 	if cheWorkspaceID == "" {
 		log.Errorln("Che Workspace ID not set and unable to deploy PFE, exiting...")
 	}
-	log.Infof("Workspace ID: %s\n", cheWorkspaceID)
+
+	// If deploy-pfe was called with the `get-service` arg, retrieve the codewind service name if it exists, and exit
+	if os.Args[1] == "get-service" {
+		fmt.Println(che.GetPFEService(clientset, namespace, cheWorkspaceID))
+		return
+	}
 
 	// Retrieve the PVC that's used for the workspace projects
 	workspacePVC := che.GetWorkspacePVC(clientset, namespace, cheWorkspaceID)

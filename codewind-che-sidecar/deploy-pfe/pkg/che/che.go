@@ -160,3 +160,14 @@ func DetectOpenShift3(config *rest.Config) bool {
 	}
 	return false
 }
+
+// GetPFEService returns the service name for the specified workspace ID
+func GetPFEService(clientset *kubernetes.Clientset, namespace string, workspaceID string) string {
+	service, err := clientset.CoreV1().Services(GetCurrentNamespace()).List(metav1.ListOptions{
+		LabelSelector: "pfeWorkspace=" + workspaceID,
+	})
+	if err != nil || len(service.Items) < 1 {
+		return ""
+	}
+	return service.Items[0].GetName()
+}

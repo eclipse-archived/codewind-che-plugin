@@ -25,7 +25,11 @@ openssl req -subj '/CN=localhost' -x509 -newkey rsa:4096 -nodes -keyout /etc/ngi
 # Discovery of codewind service in a multi-workspace per namespace scenario
 deploy-pfe
 
-CWServiceName=codewind-$CHE_WORKSPACE_ID
+CWServiceName=$(deploy-pfe get-service)
+if [ -z $CWServiceName ]; then
+    echo "ERROR: The Codewind service was not found. Aborting..."
+    exit 1
+fi
 
 echo "Codewind is now ready."
 echo "Setting proxy to Codewind service: $CWServiceName"
