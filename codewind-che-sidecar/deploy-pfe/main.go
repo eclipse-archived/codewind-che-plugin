@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	//"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 
@@ -14,7 +13,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"k8s.io/client-go/rest"
-	//"k8s.io/client-go/tools/clientcmd"
 )
 
 func main() {
@@ -43,9 +41,11 @@ func main() {
 	}
 
 	// If deploy-pfe was called with the `get-service` arg, retrieve the codewind service name if it exists, and exit
-	if os.Args[1] == "get-service" {
-		fmt.Println(che.GetPFEService(clientset, namespace, cheWorkspaceID))
-		return
+	if len(os.Args) > 1 {
+		if os.Args[1] == "get-service" {
+			fmt.Println(che.GetPFEService(clientset, namespace, cheWorkspaceID))
+			return
+		}
 	}
 
 	// Retrieve the PVC that's used for the workspace projects
