@@ -1,58 +1,68 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"os"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	types "k8s.io/apimachinery/pkg/types"
+	log "github.com/sirupsen/logrus"
+
+	"deploy-pfe/pkg/che"
+	"deploy-pfe/pkg/codewind"
+
+	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 func main() {
 	// Get the Kube config and clientsets
 	config, err := rest.InClusterConfig()
+	/*kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)*/
 	if err != nil {
-		log.Fatal(err)
+		log.Errorf("Unable to retrieve Kubernetes InClusterConfig %v\n", err)
+		os.Exit(1)
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Errorf("Unable to retrieve Kubernetes clientset %v\n", err)
+		os.Exit(1)
 	}
 
 	// Get the current namespace
-	namespace := getCurrentNamespace()
-	fmt.Println("*** Namespace: " + namespace)
+	namespace := che.GetCurrentNamespace()
+	log.Infof("Namespace: %s\n", namespace)
 
 	// Get the Che workspace ID
 	cheWorkspaceID := os.Getenv("CHE_WORKSPACE_ID")
 	if cheWorkspaceID == "" {
-		log.Fatal("Che Workspace ID not set and unable to deploy PFE, exiting...")
+		log.Errorln("Che Workspace ID not set and unable to deploy PFE, exiting...")
 	}
-	log.Printf("*** Che Workspace ID: %s\n", cheWorkspaceID)
+	log.Infof("Workspace ID: %s\n", cheWorkspaceID)
 
-	workspacePVC := getWorkspacePVC(clientset, namespace, cheWorkspaceID)
-	log.Printf("*** PVC: %s\n", workspacePVC)
+	// Retrieve the PVC that's used for the workspace projects
+	workspacePVC := che.GetWorkspacePVC(clientset, namespace, cheWorkspaceID)
+	log.Infof("PVC: %s\n", workspacePVC)
+
+	// Get the ingress domain used for Che (and Che workspaces)
+	cheIngress := che.GetCheIngress()
+	log.Infof("Ingress: %s\n", cheIngress)
 
 	// Get the Che workspace service account to use with Codewind
-	serviceAccountName := getWorkspaceServiceAccount(clientset, namespace, cheWorkspaceID)
-	log.Printf("*** Service Account: %s\n", serviceAccountName)
+	serviceAccountName := che.GetWorkspaceServiceAccount(clientset, namespace, cheWorkspaceID)
+	log.Infof("Service Account: %s\n", serviceAccountName)
 
 	// Get the name of the secret containing the workspace's registry secrets
-	secretName := getWorkspaceRegistrySecret(clientset, namespace, cheWorkspaceID)
-	log.Printf("*** Secret: %s\n", secretName)
+	secretName := che.GetWorkspaceRegistrySecret(clientset, namespace, cheWorkspaceID)
+	log.Infof("Registry Secret: %s\n", secretName)
 
 	// Get the Owner reference name and uid
-	ownerReferenceName, ownerReferenceUID := getOwnerReferences(clientset, namespace, cheWorkspaceID)
+	ownerReferenceName, ownerReferenceUID := che.GetOwnerReferences(clientset, namespace, cheWorkspaceID)
 
 	// Create the Codewind deployment object
-	codewind := CodewindDeployment{
-		Name:               CodewindPrefix + cheWorkspaceID,
+	codewindInstance := codewind.Codewind{
+		PFEName:            codewind.PFEPrefix + cheWorkspaceID,
+		PerformanceName:    codewind.PerformancePrefix + cheWorkspaceID,
 		Namespace:          namespace,
 		WorkspaceID:        cheWorkspaceID,
 		PVCName:            workspacePVC,
@@ -61,146 +71,45 @@ func main() {
 		OwnerReferenceName: ownerReferenceName,
 		OwnerReferenceUID:  ownerReferenceUID,
 		Privileged:         true,
+		Ingress:            codewind.PFEPrefix + "-" + cheWorkspaceID + "-" + cheIngress,
 	}
 
 	// Patch the Che workspace service account
-	err = patchServiceAccount(clientset, codewind)
-	fmt.Println(err)
+	err = codewind.PatchServiceAccount(clientset, codewindInstance)
+	if err != nil {
+		log.Errorf("Error: Unable to patch Che workspace service account: %v\n", err)
+		os.Exit(1)
+	}
 
 	// Deploy Codewind
-	service := createPFEService(codewind)
-	deploy := createPFEDeploy(codewind)
-
-	log.Println("Creating Codewind...")
-	_, err = clientset.CoreV1().Services(namespace).Create(&service)
+	err = codewind.DeployCodewind(clientset, codewindInstance, namespace)
 	if err != nil {
-		log.Fatalf("Error: Unable to create Codewind service: %v\n", err)
-	}
-	_, err = clientset.AppsV1().Deployments(namespace).Create(&deploy)
-	if err != nil {
-		log.Fatalf("Error: Unable to create Codewind deployment: %v\n", err)
-	}
-}
-
-func getKubeClientConfig() clientcmd.ClientConfig {
-	// Instantiate loader for kubeconfig file.
-	kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
-		&clientcmd.ConfigOverrides{},
-	)
-	return kubeconfig
-}
-
-// GetCurrentNamespace gets the current namespace in the Kubernetes context
-func getCurrentNamespace() string {
-	// Instantiate loader for kubeconfig file.
-	kubeconfig := getKubeClientConfig()
-	namespace, _, err := kubeconfig.Namespace()
-	if err != nil {
-		panic(err)
-	}
-	return namespace
-}
-
-// PatchServiceAccount takes in a list of secret names, and patches it to the specified service account
-func patchServiceAccount(clientset *kubernetes.Clientset, codewind CodewindDeployment) error {
-	patch := ServiceAccountPatch{
-		ImagePullSecrets: &[]ImagePullSecret{
-			{
-				Name: codewind.PullSecret,
-			},
-		},
+		log.Errorf("Codewind deployment failed, exiting...")
+		os.Exit(1)
 	}
 
-	b, err := json.Marshal(patch)
-	if err != nil {
-		return err
-	}
-
-	_, err = clientset.CoreV1().ServiceAccounts(codewind.Namespace).Patch(codewind.ServiceAccountName, types.StrategicMergePatchType, b)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func getWorkspacePVC(clientset *kubernetes.Clientset, namespace string, cheWorkspaceID string) string {
-	var pvcName string
-
-	PVCs, err := clientset.CoreV1().PersistentVolumeClaims(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.workspace.volume_name=projects,che.workspace_id=" + cheWorkspaceID,
-	})
-	if err != nil || PVCs == nil {
-		log.Fatal(err)
-	} else if len(PVCs.Items) < 1 {
-		// We couldn't find the workspace PVC, so need to find an alternative.
-		PVCs, err = clientset.CoreV1().PersistentVolumeClaims(namespace).List(metav1.ListOptions{
-			LabelSelector: "che.workspace_id=" + cheWorkspaceID,
-		})
-		if err != nil || PVCs == nil {
-			log.Fatal(err)
-		} else if len(PVCs.Items) < 1 {
-			pvcName = "claim-che-workspace"
-		} else {
-			pvcName = PVCs.Items[0].GetName()
+	// Expose Codewind over an ingress or route
+	isOpenShift := che.DetectOpenShift3(config)
+	if isOpenShift {
+		// Deploy a route instead on OpenShift 3.x
+		route := codewind.CreateRoute(codewindInstance)
+		routev1client, err := routev1.NewForConfig(config)
+		if err != nil {
+			log.Errorf("Error retrieving route client for OpenShift: %v\n", err)
+			os.Exit(1)
+		}
+		_, err = routev1client.Routes(namespace).Create(&route)
+		if err != nil {
+			log.Errorf("Error: Unable to create route for Codewind: %v\n", err)
+			os.Exit(1)
 		}
 	} else {
-		pvcName = PVCs.Items[0].GetName()
+		ingress := codewind.CreateIngress(codewindInstance)
+		_, err = clientset.ExtensionsV1beta1().Ingresses(namespace).Create(&ingress)
+		if err != nil {
+			log.Errorf("Error: Unable to create ingress for Codewind: %v\n", err)
+			os.Exit(1)
+		}
+
 	}
-
-	return pvcName
-}
-
-func getWorkspaceServiceAccount(clientset *kubernetes.Clientset, namespace string, cheWorkspaceID string) string {
-	var serviceAccountName string
-
-	workspacePod, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.original_name=che-workspace-pod,che.workspace_id=" + cheWorkspaceID,
-	})
-	if err != nil || workspacePod == nil {
-		log.Fatalf("Error retrieving the Che workspace pod %v\n", err)
-	} else if len(workspacePod.Items) < 1 {
-		// Default to che-workspace as the Service Account name
-		serviceAccountName = "che-workspace"
-	} else {
-		serviceAccountName = workspacePod.Items[0].Spec.ServiceAccountName
-	}
-
-	return serviceAccountName
-
-}
-
-func getWorkspaceRegistrySecret(clientset *kubernetes.Clientset, namespace string, cheWorkspaceID string) string {
-	var secretName string
-	// Retrieve the secret tagged with the workspace ID label
-	// If the secret is missing, fall back on a default value
-	registrySecret, err := clientset.CoreV1().Secrets(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.workspace_id=" + cheWorkspaceID,
-	})
-	if err != nil {
-		log.Fatalf("Error retrieving the list of secrets: %v\n", err)
-	} else if len(registrySecret.Items) < 1 {
-		secretName = cheWorkspaceID + "-private-registries"
-	} else {
-		secretName = registrySecret.Items[0].GetName()
-	}
-	return secretName
-}
-
-func getOwnerReferences(clientset *kubernetes.Clientset, namespace string, cheWorkspaceID string) (string, types.UID) {
-	// Get the Workspace pod
-	var ownerReferenceName string
-	var ownerReferenceUID types.UID
-
-	workspacePod, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.original_name=che-workspace-pod,che.workspace_id=" + cheWorkspaceID,
-	})
-	if err != nil {
-		log.Fatalf("Error: Unable to retrieve the workspace pod %v\n", err)
-	}
-	// Retrieve the owner reference name and UID from the workspace pod. This will allow Codewind to be garbage collected by Kube
-	ownerReferenceName = workspacePod.Items[0].GetOwnerReferences()[0].Name
-	ownerReferenceUID = workspacePod.Items[0].GetOwnerReferences()[0].UID
-
-	return ownerReferenceName, ownerReferenceUID
 }
