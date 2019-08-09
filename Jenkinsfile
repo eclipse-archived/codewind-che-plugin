@@ -9,6 +9,10 @@ pipeline {
         timestamps()
         skipStagesAfterUnstable()
     }
+    
+    triggers {	
+      issueCommentTrigger('trigger_build')	
+    }
 
     stages {
         stage('Build Docker image') {
