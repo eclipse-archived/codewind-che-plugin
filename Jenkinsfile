@@ -45,7 +45,7 @@ pipeline {
 
                         # Publish docker images with a filter for branch name
                         # Acceptable branch names: master, start with '<number>.<number>'
-                        if [[ $GIT_BRANCH == "master" ]] || [[ $GIT_BRANCH =~ ^([0-9]+.[0-9]+) ]]; then
+                        if [[ $GIT_BRANCH == "master" ]] || [[ $GIT_BRANCH =~ ^([0-9]+\.[0-9]+) ]]; then
                             echo "Publishing docker images for Eclipse Codewind Che Sidecar..."
                             echo "publish.sh eclipse $TAG"
                             ./scripts/publish.sh eclipse $TAG
