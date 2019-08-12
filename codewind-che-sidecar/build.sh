@@ -11,6 +11,7 @@
 #     IBM Corporation - initial API and implementation
 #*******************************************************************************
 
+# NOTE: change of this file should be in sync with 'Jenkinsfile( stage: Build Docker image)'
 
 # Move to the directory of the script that included this include file ------
 export SCRIPT_LOCT=$( cd $( dirname $0 ); pwd )

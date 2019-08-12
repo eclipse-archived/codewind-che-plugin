@@ -17,6 +17,8 @@ pipeline {
     stages {
         stage('Build Docker image') {
             steps {
+                // NOTE: change of this sh call should be in sync with  
+                //       './scripts/build.sh' and './codewind-che-sidecar/build.sh'. 
                 sh '''#!/usr/bin/env bash
                     echo "Starting build the Codewind Che plugin sidecar container..."
                     set -eu
