@@ -369,7 +369,7 @@ func CreateIngress(codewind Codewind) extensionsv1.Ingress {
 									Path: "/",
 									Backend: extensionsv1.IngressBackend{
 										ServiceName: constants.PFEPrefix + "-" + codewind.WorkspaceID,
-										ServicePort: intstr.FromInt(constants.PerformanceContainerPort),
+										ServicePort: intstr.FromInt(constants.PFEContainerPort),
 									},
 								},
 							},
