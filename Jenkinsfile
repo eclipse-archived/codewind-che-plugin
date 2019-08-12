@@ -24,12 +24,18 @@ pipeline {
                     BLUE='\033[1;34m'
                     NC='\033[0m'
 
-                    SCRIPTS_DIR=$(cd "$(dirname "$0")"; pwd)
-                    BASE_DIR=$(dirname $SCRIPTS_DIR)
-
                     # Build the sidecar image
                     printf "${BLUE}Building the Codewind sidecar image${NC}\n"
-                    cd ${BASE_DIR}/codewind-che-sidecar && ./build.sh
+                    cd ./codewind-che-sidecar 
+
+                    # Extract the filewatcherd codebase
+                    if [ -d "codewind-filewatchers" ]; then
+                        rm -rf codewind-filewatchers
+                    fi
+
+                    git clone https://github.com/eclipse/codewind-filewatchers.git
+
+                    docker build -t codewind-che-sidecar .
                 '''
             }
         }
