@@ -17,9 +17,27 @@ pipeline {
     stages {
         stage('Build Docker image') {
             steps {
+                // NOTE: change of this sh call should be in sync with  
+                //       './scripts/build.sh' and './codewind-che-sidecar/build.sh'. 
                 sh '''#!/usr/bin/env bash
-                    echo "Starting build for Eclipse Codewind Che plugin..."
-                    ./scripts/build.sh
+                    echo "Starting build the Codewind Che plugin sidecar container..."
+                    set -eu
+
+                    BLUE='\033[1;34m'
+                    NC='\033[0m'
+
+                    # Build the sidecar image
+                    printf "${BLUE}Building the Codewind sidecar image${NC}\n"
+                    cd ./codewind-che-sidecar 
+
+                    # Extract the filewatcherd codebase
+                    if [ -d "codewind-filewatchers" ]; then
+                        rm -rf codewind-filewatchers
+                    fi
+
+                    git clone https://github.com/eclipse/codewind-filewatchers.git
+
+                    docker build -t codewind-che-sidecar .
                 '''
             }
         }

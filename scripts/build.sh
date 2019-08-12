@@ -11,6 +11,8 @@
 #     IBM Corporation - initial API and implementation
 #*******************************************************************************
 
+# NOTE: change of this file should be in sync with 'Jenkinsfile( stage: Build Docker image)'
+
 # Builds the Codewind Che plugin sidecar container
 
 set -eu
