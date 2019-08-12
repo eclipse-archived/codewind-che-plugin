@@ -18,8 +18,18 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 sh '''#!/usr/bin/env bash
-                    echo "Starting build for Eclipse Codewind Che plugin..."
-                    ./scripts/build.sh
+                    echo "Starting build the Codewind Che plugin sidecar container..."
+                    set -eu
+
+                    BLUE='\033[1;34m'
+                    NC='\033[0m'
+
+                    SCRIPTS_DIR=$(cd "$(dirname "$0")"; pwd)
+                    BASE_DIR=$(dirname $SCRIPTS_DIR)
+
+                    # Build the sidecar image
+                    printf "${BLUE}Building the Codewind sidecar image${NC}\n"
+                    cd ${BASE_DIR}/codewind-che-sidecar && ./build.sh
                 '''
             }
         }
