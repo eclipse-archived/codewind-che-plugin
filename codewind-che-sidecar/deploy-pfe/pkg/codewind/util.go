@@ -2,6 +2,9 @@ package codewind
 
 import (
 	"encoding/json"
+	"os"
+
+	"deploy-pfe/pkg/constants"
 
 	"k8s.io/client-go/kubernetes"
 
@@ -40,6 +43,10 @@ func PatchServiceAccount(clientset *kubernetes.Clientset, codewind Codewind) err
 func setPFEEnvVars(codewind Codewind) []corev1.EnvVar {
 	return []corev1.EnvVar{
 		{
+			Name:  "TEKTON_PIPELINE",
+			Value: "tekton-pipelines",
+		},
+		{
 			Name:  "IN_K8",
 			Value: "true",
 		},
@@ -62,10 +69,6 @@ func setPFEEnvVars(codewind Codewind) []corev1.EnvVar {
 		{
 			Name:  "PVC_NAME",
 			Value: codewind.PVCName,
-		},
-		{
-			Name:  "SERVICE_NAME",
-			Value: "codewind-" + codewind.WorkspaceID,
 		},
 		{
 			Name:  "SERVICE_NAME",
@@ -114,11 +117,11 @@ func setPerformanceEnvVars(codewind Codewind) []corev1.EnvVar {
 		},
 		{
 			Name:  "PORTAL_HTTPS",
-			Value: "true",
+			Value: "false",
 		},
 		{
 			Name:  "CODEWIND_INGRESS",
-			Value: "codewind" + "-" + codewind.WorkspaceID + "-" + codewind.Ingress,
+			Value: codewind.Ingress,
 		},
 	}
 }
@@ -214,7 +217,7 @@ func generateDeployment(codewind Codewind, name string, image string, port int, 
 						{
 							Name:            name,
 							Image:           image,
-							ImagePullPolicy: ImagePullPolicy,
+							ImagePullPolicy: constants.ImagePullPolicy,
 							SecurityContext: &corev1.SecurityContext{
 								Privileged: &codewind.Privileged,
 							},
@@ -276,8 +279,8 @@ func generateService(codewind Codewind, name string, port int, labels map[string
 // CreateRoute returns an OpenShift route for the Codewind PFE service
 func CreateRoute(codewind Codewind) v1.Route {
 	labels := map[string]string{
-		"app":                  PerformancePrefix,
-		"performanceWorkspace": codewind.WorkspaceID,
+		"app":               constants.PFEPrefix,
+		"codewindWorkspace": codewind.WorkspaceID,
 	}
 
 	weight := int32(100)
@@ -290,7 +293,7 @@ func CreateRoute(codewind Codewind) v1.Route {
 			APIVersion: "route.openshift.io/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:   PFEPrefix + "-" + codewind.WorkspaceID,
+			Name:   constants.PFEPrefix + "-" + codewind.WorkspaceID,
 			Labels: labels,
 			OwnerReferences: []metav1.OwnerReference{
 				{
@@ -306,7 +309,7 @@ func CreateRoute(codewind Codewind) v1.Route {
 		Spec: v1.RouteSpec{
 			Host: codewind.Ingress,
 			Port: &v1.RoutePort{
-				TargetPort: intstr.FromInt(PFEContainerPort),
+				TargetPort: intstr.FromInt(constants.PFEContainerPort),
 			},
 			TLS: &v1.TLSConfig{
 				InsecureEdgeTerminationPolicy: v1.InsecureEdgeTerminationPolicyRedirect,
@@ -314,7 +317,7 @@ func CreateRoute(codewind Codewind) v1.Route {
 			},
 			To: v1.RouteTargetReference{
 				Kind:   "Service",
-				Name:   PFEPrefix + "-" + codewind.WorkspaceID,
+				Name:   constants.PFEPrefix + "-" + codewind.WorkspaceID,
 				Weight: &weight,
 			},
 		},
@@ -324,8 +327,8 @@ func CreateRoute(codewind Codewind) v1.Route {
 // CreateIngress returns a Kubernetes ingress for the Codewind PFE service
 func CreateIngress(codewind Codewind) extensionsv1.Ingress {
 	labels := map[string]string{
-		"app":                  PerformancePrefix,
-		"performanceWorkspace": codewind.WorkspaceID,
+		"app":               constants.PFEPrefix,
+		"codewindWorkspace": codewind.WorkspaceID,
 	}
 
 	annotations := map[string]string{
@@ -341,7 +344,7 @@ func CreateIngress(codewind Codewind) extensionsv1.Ingress {
 			Kind:       "Ingress",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:        PFEPrefix + "-" + codewind.WorkspaceID,
+			Name:        constants.PFEPrefix + "-" + codewind.WorkspaceID,
 			Annotations: annotations,
 			Labels:      labels,
 			OwnerReferences: []metav1.OwnerReference{
@@ -365,8 +368,8 @@ func CreateIngress(codewind Codewind) extensionsv1.Ingress {
 								{
 									Path: "/",
 									Backend: extensionsv1.IngressBackend{
-										ServiceName: PFEPrefix + "-" + codewind.WorkspaceID,
-										ServicePort: intstr.FromInt(PerformanceContainerPort),
+										ServiceName: constants.PFEPrefix + "-" + codewind.WorkspaceID,
+										ServicePort: intstr.FromInt(constants.PerformanceContainerPort),
 									},
 								},
 							},
@@ -376,4 +379,26 @@ func CreateIngress(codewind Codewind) extensionsv1.Ingress {
 			},
 		},
 	}
+}
+
+// GetImages returns the images that are to be used for PFE and the Performance dashboard in Codewind
+// If environment vars are set (such as $PFE_IMAGE, $PFE_TAG, $PERFORMANCE_IMAGE, or $PERFORMANCE_TAG), it will use those,
+// otherwise it defaults to the constants defined in constants/default.go
+func GetImages() (string, string) {
+	var pfeImage, performanceImage, pfeTag, performanceTag string
+
+	if pfeImage = os.Getenv("PFE_IMAGE"); pfeImage == "" {
+		pfeImage = constants.PFEImage
+	}
+	if performanceImage = os.Getenv("PERFORMANCE_IMAGE"); performanceImage == "" {
+		performanceImage = constants.PerformanceImage
+	}
+	if pfeTag = os.Getenv("PFE_TAG"); pfeTag == "" {
+		pfeTag = constants.PFEImageTag
+	}
+	if performanceTag = os.Getenv("PERFORMANCE_TAG"); performanceTag == "" {
+		performanceTag = constants.PerformanceTag
+	}
+
+	return pfeImage + ":" + pfeTag, performanceImage + ":" + performanceTag
 }

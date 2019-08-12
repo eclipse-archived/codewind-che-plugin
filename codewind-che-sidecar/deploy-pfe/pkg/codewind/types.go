@@ -6,6 +6,8 @@ import "k8s.io/apimachinery/pkg/types"
 type Codewind struct {
 	PFEName            string
 	PerformanceName    string
+	PFEImage           string
+	PerformanceImage   string
 	Namespace          string
 	WorkspaceID        string
 	PVCName            string

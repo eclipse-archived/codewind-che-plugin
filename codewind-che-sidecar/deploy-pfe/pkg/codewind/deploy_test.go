@@ -1,30 +1,33 @@
 package codewind
 
 import (
+	"deploy-pfe/pkg/constants"
 	"fmt"
 	"testing"
 )
 
-func setup_codewind() Codewind {
+func setupCodewind() Codewind {
 	cheWorkspaceID := "workspace1erok6723m74axkg"
 
 	return Codewind{
-		PFEName:            PFEPrefix + cheWorkspaceID,
-		PerformanceName:    PerformancePrefix + cheWorkspaceID,
+		PFEName:            constants.PFEPrefix + cheWorkspaceID,
+		PFEImage:           constants.PFEImage + ":" + constants.PFEImageTag,
+		PerformanceName:    constants.PerformancePrefix + cheWorkspaceID,
+		PerformanceImage:   constants.PerformanceImage + ":" + constants.PerformanceTag,
 		Namespace:          "default",
 		WorkspaceID:        cheWorkspaceID,
 		PVCName:            "claim-che-workspace",
 		ServiceAccountName: "che-workspace",
 		PullSecret:         "workspace1erok6723m74axkg-registry-secrets",
-		OwnerReferenceName: "test",
-		OwnerReferenceUID:  "test",
+		OwnerReferenceName: "codewind",
+		OwnerReferenceUID:  "c22d4a29-ba20-11e9-ac2a-005056a04e5e",
 		Privileged:         true,
-		Ingress:            PFEPrefix + "-" + cheWorkspaceID + "-" + "che.1.2.3.4.nip.io",
+		Ingress:            constants.PFEPrefix + "-" + cheWorkspaceID + "-" + "che.1.2.3.4.nip.io",
 	}
 }
 func TestCreatePFEDeployment(t *testing.T) {
 	// Create a test codewind instance
-	codewindInstance := setup_codewind()
+	codewindInstance := setupCodewind()
 	tests := []struct {
 		name     string
 		codewind Codewind
@@ -39,7 +42,7 @@ func TestCreatePFEDeployment(t *testing.T) {
 			deploy := createPFEDeploy(tt.codewind)
 
 			// Verify proper deployment name
-			if deploy.GetName() != PFEPrefix+"-"+tt.codewind.WorkspaceID {
+			if deploy.GetName() != constants.PFEPrefix+"-"+tt.codewind.WorkspaceID {
 				t.Error("PFE deployment name not properly set")
 			}
 
@@ -58,7 +61,7 @@ func TestCreatePFEDeployment(t *testing.T) {
 			// Verify pod labels
 			pod := deploy.Spec.Template
 			labels := pod.GetObjectMeta().GetLabels()
-			if labels["app"] != "codewind-pfe" || labels["pfeWorkspace"] != tt.codewind.WorkspaceID {
+			if labels["app"] != "codewind-pfe" || labels["codewindWorkspace"] != tt.codewind.WorkspaceID {
 				t.Error("PFE deploymeny labels improperly set")
 			}
 
@@ -68,7 +71,7 @@ func TestCreatePFEDeployment(t *testing.T) {
 				t.Errorf("PFE deployment had %v containers, expected %v", len(deployContainers), 1)
 			}
 			pfeContainer := deployContainers[0]
-			pfeImage := PFEImage + ":" + PFEImageTag
+			pfeImage := tt.codewind.PFEImage
 
 			// Verify proper PFE image is being used
 			if pfeContainer.Image != pfeImage {
@@ -80,7 +83,7 @@ func TestCreatePFEDeployment(t *testing.T) {
 
 func TestCreatePFEService(t *testing.T) {
 	// Create a test codewind instance
-	codewindInstance := setup_codewind()
+	codewindInstance := setupCodewind()
 	tests := []struct {
 		name     string
 		codewind Codewind
@@ -96,7 +99,7 @@ func TestCreatePFEService(t *testing.T) {
 			deploy := createPFEDeploy(tt.codewind)
 
 			// Verify proper deployment name
-			if service.GetName() != PFEPrefix+"-"+tt.codewind.WorkspaceID {
+			if service.GetName() != constants.PFEPrefix+"-"+tt.codewind.WorkspaceID {
 				t.Error("PFE service name not properly set")
 			}
 
@@ -115,7 +118,7 @@ func TestCreatePFEService(t *testing.T) {
 			// Verify label selctor matches the labels on the PFE pod
 			serviceSelector := service.Spec.Selector
 			pfeLabels := deploy.Spec.Template.Labels
-			if serviceSelector["app"] != pfeLabels["app"] || serviceSelector["pfeWorkspace"] != pfeLabels["pfeWorkspace"] {
+			if serviceSelector["app"] != pfeLabels["app"] || serviceSelector["codewindWorkspace"] != pfeLabels["codewindWorkspace"] {
 				t.Errorf("PFE service selector labels and pod labels don't match.")
 			}
 			// Verify that the proper PFE port is exposed
@@ -123,8 +126,8 @@ func TestCreatePFEService(t *testing.T) {
 			if len(servicePorts) != 1 {
 				t.Errorf("PFE service exposing wrong number of ports. Had %v, expected %v", len(servicePorts), 1)
 			}
-			if servicePorts[0].Port != PFEContainerPort {
-				t.Errorf("PFE service port not properly exposed. Port %v exposed instead of %v", servicePorts[0].Port, PFEContainerPort)
+			if servicePorts[0].Port != constants.PFEContainerPort {
+				t.Errorf("PFE service port not properly exposed. Port %v exposed instead of %v", servicePorts[0].Port, constants.PFEContainerPort)
 			}
 		})
 	}
@@ -132,7 +135,7 @@ func TestCreatePFEService(t *testing.T) {
 
 func TestCreatePerformanceDeployment(t *testing.T) {
 	// Create a test codewind instance
-	codewindInstance := setup_codewind()
+	codewindInstance := setupCodewind()
 	tests := []struct {
 		name     string
 		codewind Codewind
@@ -147,7 +150,7 @@ func TestCreatePerformanceDeployment(t *testing.T) {
 			deploy := createPerformanceDeploy(tt.codewind)
 
 			// Verify proper deployment name
-			if deploy.GetName() != PerformancePrefix+"-"+tt.codewind.WorkspaceID {
+			if deploy.GetName() != constants.PerformancePrefix+"-"+tt.codewind.WorkspaceID {
 				t.Error("Performance deployment name not properly set")
 			}
 
@@ -166,7 +169,7 @@ func TestCreatePerformanceDeployment(t *testing.T) {
 			// Verify pod labels
 			pod := deploy.Spec.Template
 			labels := pod.GetObjectMeta().GetLabels()
-			if labels["app"] != "codewind-performance" || labels["performanceWorkspace"] != tt.codewind.WorkspaceID {
+			if labels["app"] != "codewind-performance" || labels["codewindWorkspace"] != tt.codewind.WorkspaceID {
 				t.Error("Performance deployment labels improperly set")
 			}
 
@@ -176,7 +179,7 @@ func TestCreatePerformanceDeployment(t *testing.T) {
 				t.Errorf("Performance deployment had %v containers, expected %v", len(deployContainers), 1)
 			}
 			perfContainer := deployContainers[0]
-			pfeImage := PerformanceImage + ":" + PerformanceTag
+			pfeImage := tt.codewind.PerformanceImage
 
 			// Verify proper PFE image is being used
 			if perfContainer.Image != pfeImage {
@@ -188,7 +191,7 @@ func TestCreatePerformanceDeployment(t *testing.T) {
 
 func TestCreatePerformanceService(t *testing.T) {
 	// Create a test codewind instance
-	codewindInstance := setup_codewind()
+	codewindInstance := setupCodewind()
 	tests := []struct {
 		name     string
 		codewind Codewind
@@ -204,7 +207,7 @@ func TestCreatePerformanceService(t *testing.T) {
 			deploy := createPerformanceDeploy(tt.codewind)
 
 			// Verify proper deployment name
-			if service.GetName() != PerformancePrefix+"-"+tt.codewind.WorkspaceID {
+			if service.GetName() != constants.PerformancePrefix+"-"+tt.codewind.WorkspaceID {
 				t.Error("PFE service name not properly set")
 			}
 
@@ -223,7 +226,7 @@ func TestCreatePerformanceService(t *testing.T) {
 			// Verify label selctor matches the labels on the PFE pod
 			serviceSelector := service.Spec.Selector
 			pfeLabels := deploy.Spec.Template.Labels
-			if serviceSelector["app"] != pfeLabels["app"] || serviceSelector["performanceWorkspace"] != pfeLabels["performanceWorkspace"] {
+			if serviceSelector["app"] != pfeLabels["app"] || serviceSelector["codewindWorkspace"] != pfeLabels["codewindWorkspace"] {
 				t.Errorf("PFE service selector labels and pod labels don't match.")
 			}
 			// Verify that the proper PFE port is exposed
@@ -231,8 +234,8 @@ func TestCreatePerformanceService(t *testing.T) {
 			if len(servicePorts) != 1 {
 				t.Errorf("PFE service exposing wrong number of ports. Had %v, expected %v", len(servicePorts), 1)
 			}
-			if servicePorts[0].Port != int32(PerformanceContainerPort) {
-				t.Errorf("PFE service port not properly exposed. Port %v exposed instead of %v", servicePorts[0].Port, PerformanceContainerPort)
+			if servicePorts[0].Port != int32(constants.PerformanceContainerPort) {
+				t.Errorf("PFE service port not properly exposed. Port %v exposed instead of %v", servicePorts[0].Port, constants.PerformanceContainerPort)
 			}
 		})
 	}

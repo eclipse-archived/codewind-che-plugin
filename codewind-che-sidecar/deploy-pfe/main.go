@@ -3,26 +3,32 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 
 	"deploy-pfe/pkg/che"
 	"deploy-pfe/pkg/codewind"
+	"deploy-pfe/pkg/constants"
+	"deploy-pfe/pkg/kube"
 
 	routev1 "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"k8s.io/client-go/kubernetes"
-
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func main() {
 	// Get the Kube config and clientsets
 	config, err := rest.InClusterConfig()
-	/*kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)*/
 	if err != nil {
-		log.Errorf("Unable to retrieve Kubernetes InClusterConfig %v\n", err)
-		os.Exit(1)
+		// Couldn't find an InClusterConfig, may be running outside of Kube, so try to find a local kube config file
+		kubeconfig := filepath.Join(os.Getenv("HOME"), ".kube", "config")
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			log.Errorf("Unable to retrieve Kubernetes InClusterConfig %v\n", err)
+			os.Exit(1)
+		}
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
@@ -32,7 +38,7 @@ func main() {
 	}
 
 	// Get the current namespace
-	namespace := che.GetCurrentNamespace()
+	namespace := kube.GetCurrentNamespace()
 
 	// Get the Che workspace ID
 	cheWorkspaceID := os.Getenv("CHE_WORKSPACE_ID")
@@ -41,10 +47,13 @@ func main() {
 	}
 
 	// If deploy-pfe was called with the `get-service` arg, retrieve the codewind service name if it exists, and exit
+	redeploy := false
 	if len(os.Args) > 1 {
 		if os.Args[1] == "get-service" {
 			fmt.Println(che.GetPFEService(clientset, namespace, cheWorkspaceID))
 			return
+		} else if os.Args[1] == "redeploy" {
+			redeploy = true
 		}
 	}
 
@@ -67,10 +76,15 @@ func main() {
 	// Get the Owner reference name and uid
 	ownerReferenceName, ownerReferenceUID := che.GetOwnerReferences(clientset, namespace, cheWorkspaceID)
 
+	// Retrieve the images for PFE and Performance dashboard
+	pfe, performance := codewind.GetImages()
+
 	// Create the Codewind deployment object
 	codewindInstance := codewind.Codewind{
-		PFEName:            codewind.PFEPrefix + cheWorkspaceID,
-		PerformanceName:    codewind.PerformancePrefix + cheWorkspaceID,
+		PFEName:            constants.PFEPrefix + cheWorkspaceID,
+		PFEImage:           pfe,
+		PerformanceName:    constants.PerformancePrefix + cheWorkspaceID,
+		PerformanceImage:   performance,
 		Namespace:          namespace,
 		WorkspaceID:        cheWorkspaceID,
 		PVCName:            workspacePVC,
@@ -79,7 +93,7 @@ func main() {
 		OwnerReferenceName: ownerReferenceName,
 		OwnerReferenceUID:  ownerReferenceUID,
 		Privileged:         true,
-		Ingress:            codewind.PFEPrefix + "-" + cheWorkspaceID + "-" + cheIngress,
+		Ingress:            constants.PFEPrefix + "-" + cheWorkspaceID + "-" + cheIngress,
 	}
 
 	// Patch the Che workspace service account
@@ -90,6 +104,14 @@ func main() {
 	}
 
 	// Deploy Codewind
+	if redeploy {
+		err = codewind.RedeployCodewind(clientset, codewindInstance)
+		if err != nil {
+			log.Errorf("Unable to redeploy Codewind: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
 	err = codewind.DeployCodewind(clientset, codewindInstance, namespace)
 	if err != nil {
 		log.Errorf("Codewind deployment failed, exiting...")
@@ -97,7 +119,7 @@ func main() {
 	}
 
 	// Expose Codewind over an ingress or route
-	isOpenShift := che.DetectOpenShift3(config)
+	isOpenShift := kube.DetectOpenShift3(config)
 	if isOpenShift {
 		// Deploy a route instead on OpenShift 3.x
 		route := codewind.CreateRoute(codewindInstance)
@@ -106,13 +128,16 @@ func main() {
 			log.Errorf("Error retrieving route client for OpenShift: %v\n", err)
 			os.Exit(1)
 		}
+
 		_, err = routev1client.Routes(namespace).Create(&route)
 		if err != nil {
 			log.Errorf("Error: Unable to create route for Codewind: %v\n", err)
 			os.Exit(1)
 		}
+
 	} else {
 		ingress := codewind.CreateIngress(codewindInstance)
+
 		_, err = clientset.ExtensionsV1beta1().Ingresses(namespace).Create(&ingress)
 		if err != nil {
 			log.Errorf("Error: Unable to create ingress for Codewind: %v\n", err)
@@ -120,4 +145,5 @@ func main() {
 		}
 
 	}
+
 }
