@@ -47,13 +47,10 @@ func main() {
 	}
 
 	// If deploy-pfe was called with the `get-service` arg, retrieve the codewind service name if it exists, and exit
-	redeploy := false
 	if len(os.Args) > 1 {
 		if os.Args[1] == "get-service" {
 			fmt.Println(che.GetPFEService(clientset, namespace, cheWorkspaceID))
 			return
-		} else if os.Args[1] == "redeploy" {
-			redeploy = true
 		}
 	}
 
@@ -103,15 +100,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Deploy Codewind
-	if redeploy {
-		err = codewind.RedeployCodewind(clientset, codewindInstance)
-		if err != nil {
-			log.Errorf("Unable to redeploy Codewind: %v\n", err)
-			os.Exit(1)
-		}
-		return
-	}
 	err = codewind.DeployCodewind(clientset, codewindInstance, namespace)
 	if err != nil {
 		log.Errorf("Codewind deployment failed, exiting...")
