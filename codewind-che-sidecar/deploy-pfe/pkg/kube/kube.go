@@ -12,12 +12,12 @@ import (
 
 // GetKubeClientConfig retrieves the Kubernetes client config from the cluster
 func GetKubeClientConfig() clientcmd.ClientConfig {
-	// Instantiate loader for kubeconfig file.
-	kubeconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+	// Retrieve the Kube client config
+	clientconfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		clientcmd.NewDefaultClientConfigLoadingRules(),
 		&clientcmd.ConfigOverrides{},
 	)
-	return kubeconfig
+	return clientconfig
 }
 
 // GetCurrentNamespace gets the current namespace in the Kubernetes context
