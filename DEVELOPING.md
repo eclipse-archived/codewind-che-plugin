@@ -2,8 +2,8 @@
 
 ### Set the Codewind container image
 
-If deploying a custom image of Codewind from https://github.com/eclipse/codewind, make sure to set https://github.com/eclipse/codewind-che-plugin/blob/master/codewind-che-sidecar/scripts/kube/codewind_template.yaml#L88 to point to your tagged and pushed `codewind-pfe-amd64` docker image.
- - Otherwise, leave it as `eclipse/codewind-pfe-amd64:latest`
+If deploying a custom image of Codewind from https://github.com/eclipse/codewind, make sure to update https://github.com/eclipse/codewind-che-plugin/blob/master/codewind-che-sidecar/deploy-pfe/pkg/constants/defaults.go to point to your tagged and pushed `codewind-pfe-amd64` and `codewind-performance-amd64` docker images.
+ - Otherwise, leave them as `eclipse/codewind-pfe-amd64` and `eclipse/codewind-performance-amd64`
 
 ### Build the Codewind plugin
 
