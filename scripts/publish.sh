@@ -46,7 +46,7 @@ name: CodewindPlugin
 title: CodewindPlugin
 description: Enables iterative development and deployment in Che
 icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
-publisher: Eclipse
+publisher: eclipse
 repository: https://github.com/eclipse/codewind-che-plugin
 category: Other
 firstPublicationDate: "2019-05-30"
@@ -60,7 +60,6 @@ spec:
         name: projects
     ports:
       - exposedPort: 9090
-
 EOF
 
 # Create the meta.yaml for the Theia extension
@@ -82,7 +81,6 @@ latestUpdateDate: "$(date '+%Y-%m-%d')"
 spec:
   extensions:
     - http://download.eclipse.org/codewind/codewind-vscode/master/latest/codewind-theia.vsix
-
 EOF
 
 echo "Published the codewind-sidecar and codewind-theia meta.yamls under $BASE_DIR/publish"

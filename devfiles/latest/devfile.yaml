@@ -21,15 +21,15 @@ projects:
   - name: springproj
     source:
       type: git
-      location: 'https://github.com/maysunfaisal/maysunspring1.git'
+      location: 'https://github.com/microclimate-dev2ops/springJavaTemplate'
   - name: swiftproj
     source:
       type: git
-      location: 'https://github.com/maysunfaisal/maysunswi.git'
+      location: 'https://github.com/microclimate-dev2ops/swiftTemplate'
   - name: microproj
     source:
       type: git
-      location: 'https://github.com/maysunfaisal/hellomicro.git'
+      location: 'https://github.com/microclimate-dev2ops/javaMicroProfileTemplate'
   - name: nodeTemplate
     source:
       type: git
@@ -37,7 +37,7 @@ projects:
 components:
   - alias: theia-ide
     type: cheEditor
-    id: eclipse/che-theia/7.0.0-rc-3.0
+    id: eclipse/che-theia/7.0.0-rc-4.0
   - alias: exec-plugin
     type: chePlugin
     id: eclipse/che-machine-exec-plugin/0.0.1
