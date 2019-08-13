@@ -17,7 +17,7 @@ name: CodewindPlugin
 title: CodewindPlugin
 description: Enables iterative development and deployment in Che
 icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
-publisher: IBM
+publisher: eclipse
 repository: https://github.com/eclipse/codewind-che-plugin
 category: Other
 firstPublicationDate: "2019-05-30"
