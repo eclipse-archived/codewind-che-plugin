@@ -18,8 +18,8 @@ load testutil
 setup() {
     export time_before=$SECONDS
 
-    if [ -z "$CLUSTER_IP" ]; then
-        echo "# Cluster IP is not defined in " '$CLUSTER_IP' >&3
+    if [ -z "$CHE_INGRESS_DOMAIN" ]; then
+        echo "# Che ingress domain is not defined in " '$CHE_INGRESS_DOMAIN' >&3
         exit 1
     fi
 
@@ -28,9 +28,8 @@ setup() {
         exit 1
     fi
 
-    export CODEWIND_DEVFILE_URL=https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/0.2.0/devfile.yaml
-    export CODEWIND_DEVILE_JSON=devfile.json
-    export CHE_INGRESS_DOMAIN=http://che-$CHE_NAMESPACE.$CLUSTER_IP.nip.io
+    export CODEWIND_DEVFILE_URL=https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml
+    export CHE_INGRESS_DOMAIN_URL=http://$CHE_INGRESS_DOMAIN
     export KUBE_NAMESPACE_ARG="-n $CHE_NAMESPACE"
 
     # Discover workspace ID written into temporary file during workspace creation
@@ -52,20 +51,14 @@ teardown() {
 }
 
 @test "Codewind Sidecar Test #1: Create Che workspace from Codewind dev file" {
-    # TODO: convert live .yaml dev file in url to local json file?
-    # TODO: always assume just one codewind related workspace? (=> no need to store workspace ID), 
-    #       if not, use global var outside of bats to store workspace ID rather than local file?
-    # TODO: use dynamically generated workspace name?, delete existing workspace if same name?
-
     createCodewindCheWorkspace
 }
 
 @test "Codewind Sidecar Test #2: Verify Codewind workspace pod is running" {
-    # Check if pod has started, timeout after 5 minutes
-    runtime="5 minute"
-    endtime=$(date -ud "$runtime" +%s)
+    # Check if pod has started, timeout after 10 minutes
+    endtime=$(($SECONDS + 600))
     pod_running=false
-    while [[ $(date -u +%s) -le $endtime ]]; do
+    while (( $SECONDS < $endtime )); do
         run getCodewindPod
         if [[ $output = *"Running"* ]]; then
             pod_running=true
@@ -84,11 +77,10 @@ teardown() {
 
 @test "Codewind Sidecar Test #3: Verify sidecar container is running and ready, and Codewind service successfully deployed" {
     # Check if sidecar main processes have started after codewind server deployment, timeout after 10 minutes
-    runtime="10 minute"
-    endtime=$(date -ud "$runtime" +%s)
+    endtime=$(($SECONDS + 600))
     nginx_process_running=false
     filewatcherd_process_running=false
-    while [[ $(date -u +%s) -le $endtime ]]; do
+    while (( $SECONDS < $endtime )); do
         run getPIDofProcessInContainer $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME nginx
         if [ "$status" -eq 0 ]; then
             nginx_process_running=true
@@ -119,11 +111,10 @@ teardown() {
 }
 
 @test "Codewind Sidecar Test #4: Verify filewatcher daemon is up & running" {
-    # Check that filewatcher daemon properly started, timeout after 2 minutes
-    runtime="2 minute"
-    endtime=$(date -ud "$runtime" +%s)
+    # Check that the filewatcher daemon properly started, timeout after 2 minutes
+    endtime=$(($SECONDS + 120))
     filewatcherd_ready=false
-    while [[ $(date -u +%s) -le $endtime ]]; do
+    while (( $SECONDS < $endtime )); do
         run checkFilewatcherDaemonRunning
         if [ "$status" -eq 0 ]; then 
             filewatcherd_ready=true
@@ -135,17 +126,16 @@ teardown() {
 }
 
 @test "Codewind Sidecar Test #5: Verify filewatcher daemon restarts after kill" {
-    time_before_kill="$(date -u +%s)"
+    time_before_kill=$SECONDS
 
     # Kill filewatcherd process in the sidecar container
     fwd_pid=$(getPIDofProcessInContainer $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME filewatcherd)
     kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- kill $fwd_pid
 
     # Check every 5 seconds if filewatcherd has restarted, timeout after 5 minutes
-    runtime="5 minute"
-    endtime=$(date -ud "$runtime" +%s)
+    endtime=$(($SECONDS + 300))
     fwd_restarted=false
-    while [[ $(date -u +%s) -le $endtime ]]; do
+    while (( $SECONDS < $endtime )); do
         sleep 5
         run getFileWatcherDaemonProcess
         if [ "$status" -eq 0 ]; then
@@ -160,8 +150,7 @@ teardown() {
     sleep 10
 
     # Calculate approx time elapsed (in seconds) between filewatcher daemon kill and restart so as to only check the logs during that time
-    time_after_restart="$(date -u +%s)"
-    time_elapsed="$(($time_after_restart-$time_before_kill))"
+    time_elapsed="$(($SECONDS - $time_before_kill))"
 
     # Check if the filewatcher daemon started properly
     checkFilewatcherDaemonRunning "$time_elapsed"
@@ -179,10 +168,9 @@ teardown() {
     sleep 10
 
     # Check every 5 seconds if sidecar container is started and ready, timeout after 5 minutes
-    runtime="10 minute"
-    endtime=$(date -ud "$runtime" +%s)
+    endtime=$(($SECONDS + 600))
     sidecar_ready=false
-    while [[ $(date -u +%s) -le $endtime ]]; do
+    while (( $SECONDS < $endtime )); do
         sleep 5
         # Check that sidecar is started and ready, and has one more restart than before nginx was killed
         run checkSidecarContainerReady "((container_restarts_current + 1))"

@@ -9,11 +9,14 @@ Tests for verifying Codewind and sidecar container functionality in a Che enviro
 
 - Bash shell environment
 - Kubernetes cluster with Eclipse Che installed and pre-requisites for Codewind already set up (such as the cluster roles)
-- `kubectl` tool configured for your cluster
+- User authenticated properly for the cluster
+- `kubectl` tool configured for the cluster
 - [BATS Bash testing environment](https://github.com/bats-core/bats-core)
+- `curl` [tool](https://curl.haxx.se/)
 - `jq` json parsing [tool](https://stedolan.github.io/jq/)
+- `yq` yaml parsing [tool](https://github.com/mikefarah/yq)
  
 ## Running the tests
 
-- To run the tests, invoke: `test_sidecar.sh <cluster IP> <Che namespace>`, for example `test_sidecar.sh 10.98.130.246 che`
-- The test suite will create a new Che workspace based on a standard Codewind devfile, test various scenarios, and finally delete the workspace
+- To run the tests, invoke: `test_sidecar.sh <Che ingress domain> <Che namespace>`, for example `test_sidecar.sh che-che.10.98.130.246.nip.io che`
+- The test suite will create a new Che workspace based on the latest Codewind devfile, test various scenarios, and finally delete the workspace
