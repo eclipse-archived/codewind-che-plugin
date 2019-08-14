@@ -12,12 +12,20 @@
 #*******************************************************************************
 
 if [[ ($# -ne 2) || ( -z "$1" ) || ( -z "$2" ) ]]; then
-    echo -e "Usage: test_sidecar.sh <cluster IP> <Che namespace>"
-    echo -e "Example: test_sidecar.sh 10.98.130.246 che"
+    echo -e "Usage: test_sidecar.sh <Che ingress domain> <Che namespace>"
+    echo -e "Example: test_sidecar.sh che-che.10.98.130.246.nip.io che"
     exit 1
 fi
 
-export CLUSTER_IP=$1
+neededtools=("curl" "kubectl" "bats" "jq" "yq")
+for i in "${neededtools[@]}"; do
+  if ! [ -x "$(command -v $i)" ]; then
+    echo "Error: $i is not installed." >&2
+    exit 1
+  fi
+done
+
+export CHE_INGRESS_DOMAIN=$1
 export CHE_NAMESPACE=$2
 
 bats sidecarfvt.bats
