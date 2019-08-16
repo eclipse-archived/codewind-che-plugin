@@ -58,7 +58,7 @@ rules:
 
 - apiGroups: ["apps", "extensions"]
   resources: ["deployments"]
-  verbs: ["watch", "get", "list", "create", "update", "delete"]
+  verbs: ["watch", "get", "list", "create", "update", "delete", "patch"]
 
 - apiGroups: ["extensions", "apps"]
   resources: ["replicasets", "replicasets/finalizers"]
