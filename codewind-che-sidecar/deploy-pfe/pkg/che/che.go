@@ -110,7 +110,7 @@ func GetOwnerReferences(clientset *kubernetes.Clientset, namespace string, cheWo
 func GetCheIngress(cheAPI string) (string, error) {
 	// Log an error and return if a blank string was passed in
 	if cheAPI == "" {
-		return "", fmt.Errorf("Che Workspace ID is not set")
+		return "", fmt.Errorf("Che API URL was not set")
 	}
 
 	cheURL, err := url.Parse(cheAPI)
