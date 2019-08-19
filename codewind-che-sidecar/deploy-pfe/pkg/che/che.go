@@ -124,7 +124,7 @@ func GetCheIngress(cheAPI string) (string, error) {
 	}
 
 	// Return the hostname of the Che API URL. This will have the http/https and path stripped out
-	return cheURL.Hostname(), nil
+	return parsedURL, nil
 
 }
 
