@@ -44,6 +44,7 @@ func main() {
 	cheWorkspaceID := os.Getenv("CHE_WORKSPACE_ID")
 	if cheWorkspaceID == "" {
 		log.Errorln("Che Workspace ID not set and unable to deploy PFE, exiting...")
+		os.Exit(1)
 	}
 
 	// If deploy-pfe was called with the `get-service` arg, retrieve the codewind service name if it exists, and exit
@@ -59,7 +60,11 @@ func main() {
 	log.Infof("PVC: %s\n", workspacePVC)
 
 	// Get the ingress domain used for Che (and Che workspaces)
-	cheIngress := che.GetCheIngress()
+	cheIngress, err := che.GetCheIngress(os.Getenv("CHE_API"))
+	if err != nil {
+		log.Errorf("Unable to determine Che ingress domain: %v\n", err)
+		os.Exit(1)
+	}
 	log.Infof("Ingress: %s\n", cheIngress)
 
 	// Get the Che workspace service account to use with Codewind

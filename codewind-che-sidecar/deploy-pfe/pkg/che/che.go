@@ -1,8 +1,9 @@
 package che
 
 import (
+	"fmt"
+	"net/url"
 	"os"
-	"strings"
 
 	"deploy-pfe/pkg/kube"
 
@@ -105,15 +106,25 @@ func GetOwnerReferences(clientset *kubernetes.Clientset, namespace string, cheWo
 	return ownerReferenceName, ownerReferenceUID
 }
 
-// GetCheIngress parses the Che ingress domain from the `CHE_API` environment variable
-func GetCheIngress() string {
-	cheAPI := os.Getenv("CHE_API")
+// GetCheIngress parses the Che ingress domain from the Che API URL that was passed in
+func GetCheIngress(cheAPI string) (string, error) {
+	// Log an error and return if a blank string was passed in
 	if cheAPI == "" {
-		log.Errorf("Che Workspace ID not set and unable to deploy PFE, exiting...")
-		os.Exit(1)
+		return "", fmt.Errorf("Che Workspace ID is not set")
 	}
-	cheIngress := strings.TrimLeft(strings.TrimRight(cheAPI, "/api"), "http://")
-	return cheIngress
+
+	cheURL, err := url.Parse(cheAPI)
+	if err != nil {
+		return "", fmt.Errorf("unable to parse the Che API URL")
+	}
+
+	parsedURL := cheURL.Hostname()
+	if parsedURL == "" {
+		return "", fmt.Errorf("parsed Che API URL is empty")
+	}
+
+	// Return the hostname of the Che API URL. This will have the http/https and path stripped out
+	return cheURL.Hostname(), nil
 
 }
 
