@@ -106,7 +106,7 @@ teardown() {
 
     checkSidecarContainerReady
 
-    cw_service_name=$(kubectl get svc --selector=app=codewind-pfe,pfeWorkspace=$CHE_WORKSPACE_ID -o jsonpath="{.items[0].metadata.name}" $KUBE_NAMESPACE_ARG)
+    cw_service_name=$(kubectl get svc --selector=app=codewind-pfe,codewindWorkspace=$CHE_WORKSPACE_ID -o jsonpath="{.items[0].metadata.name}" $KUBE_NAMESPACE_ARG)
     [ ! -z "$cw_service_name" ]
 }
 
