@@ -100,7 +100,7 @@ func setPFEEnvVars(codewind Codewind) []corev1.EnvVar {
 		},
 		{
 			Name:  "CODEWIND_PERFORMANCE_SERVICE",
-			Value: codewind.PerformanceName + "-" + codewind.WorkspaceID,
+			Value: constants.PerformancePrefix + "-" + codewind.WorkspaceID,
 		},
 		{
 			Name:  "CHE_INGRESS_HOST",
