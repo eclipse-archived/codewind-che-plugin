@@ -265,13 +265,13 @@ func TestVerifyPFEEnvVars(t *testing.T) {
 			// Verify that KUBE_NAMESPACE and TILLER_NAMESPACE matches the namespace that codewind is deployed in
 			if env.Name == "KUBE_NAMESPACE" {
 				if env.Value != pfeDeploy.GetNamespace() {
-					t.Errorf("KUBE_NAMESPACE doesn't match the namespace that Codewind is deployed in %v\n", performanceService.GetName())
+					t.Errorf("KUBE_NAMESPACE doesn't match the namespace that Codewind is deployed in %v\n", pfeDeploy.GetNamespace())
 				}
 				continue
 			}
 			if env.Name == "TILLER_NAMESPACE" {
 				if env.Value != pfeDeploy.GetNamespace() {
-					t.Errorf("TILLER_NAMESPACE doesn't match Performance Dashboard service name: %v\n", performanceService.GetName())
+					t.Errorf("TILLER_NAMESPACE doesn't match Performance Dashboard service name: %v\n", pfeDeploy.GetNamespace())
 				}
 				continue
 			}
@@ -279,7 +279,7 @@ func TestVerifyPFEEnvVars(t *testing.T) {
 			// Verify that SERVICE_ACCOUNT_NAME matches the service account that Codewind-PFE is running in
 			if env.Name == "SERVICE_ACCOUNT_NAME" {
 				if env.Value != pfeDeploy.Spec.Template.Spec.ServiceAccountName {
-					t.Errorf("SERVICE_ACCOUNT_NAME doesn't match Codewind-PFE service account name: %v\n", performanceService.GetName())
+					t.Errorf("SERVICE_ACCOUNT_NAME doesn't match Codewind-PFE service account name: %v\n", pfeDeploy.Spec.Template.Spec.ServiceAccountName)
 				}
 				continue
 			}
@@ -287,7 +287,7 @@ func TestVerifyPFEEnvVars(t *testing.T) {
 			// Verify that SERVICE_NAME matches the Codewind-PFE service name
 			if env.Name == "SERVICE_NAME" {
 				if env.Value != pfeService.GetName() {
-					t.Errorf("SERVICE_NAME doesn't match PFE service name: %v\n", performanceService.GetName())
+					t.Errorf("SERVICE_NAME doesn't match PFE service name: %v\n", pfeService.GetName())
 				}
 				continue
 			}
