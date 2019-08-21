@@ -240,3 +240,66 @@ func TestCreatePerformanceService(t *testing.T) {
 		})
 	}
 }
+
+// TestVerifyPFEEnvVars verifies that the environment variables passed into Codewind-PFE have the proper values
+func TestVerifyPFEEnvVars(t *testing.T) {
+	codewindInstance := setupCodewind()
+	tests := []struct {
+		name     string
+		codewind Codewind
+	}{
+		{
+			name:     fmt.Sprintf("Verify PFE Environment Variables"),
+			codewind: codewindInstance,
+		},
+	}
+	for _, tt := range tests {
+		pfeDeploy := createPFEDeploy(tt.codewind)
+		pfeService := createPFEService(tt.codewind)
+
+		performanceService := createPerformanceService(tt.codewind)
+
+		pfeEnvVars := pfeDeploy.Spec.Template.Spec.Containers[0].Env
+
+		for _, env := range pfeEnvVars {
+			// Verify that KUBE_NAMESPACE and TILLER_NAMESPACE matches the namespace that codewind is deployed in
+			if env.Name == "KUBE_NAMESPACE" {
+				if env.Value != pfeDeploy.GetNamespace() {
+					t.Errorf("KUBE_NAMESPACE doesn't match the namespace that Codewind is deployed in %v\n", performanceService.GetName())
+				}
+				continue
+			}
+			if env.Name == "TILLER_NAMESPACE" {
+				if env.Value != pfeDeploy.GetNamespace() {
+					t.Errorf("TILLER_NAMESPACE doesn't match Performance Dashboard service name: %v\n", performanceService.GetName())
+				}
+				continue
+			}
+
+			// Verify that SERVICE_ACCOUNT_NAME matches the service account that Codewind-PFE is running in
+			if env.Name == "SERVICE_ACCOUNT_NAME" {
+				if env.Value != pfeDeploy.Spec.Template.Spec.ServiceAccountName {
+					t.Errorf("SERVICE_ACCOUNT_NAME doesn't match Codewind-PFE service account name: %v\n", performanceService.GetName())
+				}
+				continue
+			}
+
+			// Verify that SERVICE_NAME matches the Codewind-PFE service name
+			if env.Name == "SERVICE_NAME" {
+				if env.Value != pfeService.GetName() {
+					t.Errorf("SERVICE_NAME doesn't match PFE service name: %v\n", performanceService.GetName())
+				}
+				continue
+			}
+
+			// Verify that the Performance dashboard service name matches the value passed into the Codewind-PFE container
+			if env.Name == "CODEWIND_PERFORMANCE_SERVICE" {
+				if env.Value != performanceService.GetName() {
+					t.Errorf("CODEWIND_PERFORMANCE_SERVICE doesn't match Performance Dashboard service name: %v\n", performanceService.GetName())
+				}
+				continue
+			}
+
+		}
+	}
+}
