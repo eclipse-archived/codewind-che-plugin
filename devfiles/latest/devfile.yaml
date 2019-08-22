@@ -13,27 +13,6 @@
 apiVersion: 1.0.0
 metadata:
   name: codewind-che
-projects:
-  - name: goproj
-    source:
-      type: git
-      location: 'https://github.com/microclimate-dev2ops/microclimateGoTemplate'
-  - name: springproj
-    source:
-      type: git
-      location: 'https://github.com/microclimate-dev2ops/springJavaTemplate'
-  - name: swiftproj
-    source:
-      type: git
-      location: 'https://github.com/microclimate-dev2ops/swiftTemplate'
-  - name: microproj
-    source:
-      type: git
-      location: 'https://github.com/microclimate-dev2ops/javaMicroProfileTemplate'
-  - name: nodeTemplate
-    source:
-      type: git
-      location: 'https://github.com/microclimate-dev2ops/nodeExpressTemplate'
 components:
   - alias: theia-ide
     type: cheEditor
