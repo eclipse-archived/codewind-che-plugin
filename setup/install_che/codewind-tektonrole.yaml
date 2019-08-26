@@ -14,7 +14,6 @@ kind: ClusterRole
 metadata:
   name: codewind-tekton
 rules:
-- apiGroups: ["extensions"]
-  resources: ["ingresses", "ingresses/status"]
-  verbs: ["delete", "create", "patch", "get", "list", "update", "watch", "use"]
-
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "create", "delete", "patch"]
