@@ -70,12 +70,11 @@ elif [[ "$INSTALL_MODE" == "os" ]]; then
     oc adm policy add-scc-to-group anyuid system:serviceaccounts:eclipse-che
 
     # Install Che using the openshift deployment scripts
-    git clone https://github.com/eclipse/che.git
+    git clone -b 7.0.x https://github.com/eclipse/che.git
     cd che/deploy/openshift
     
-    echo 'os'
     # Deploy on OpenShift
-    ./deploy_che.sh --image-che=eclipse/che-server:7.0.0-RC-2.0
+    ./deploy_che.sh --image-che=eclipse/che-server:7.0.0
 
     # Create the role binding
     kubectl apply -f ${BASE_DIR}/codewind-rolebinding.yaml -n eclipse-che
@@ -88,7 +87,7 @@ else
     fi
 
     # Clone the Che repositor, as that's where the Che helm chart resides
-    git clone -b 7.0.0-RC-2.x https://github.com/eclipse/che.git
+    git clone -b 7.0.x https://github.com/eclipse/che.git
     cd che/deploy/kubernetes/helm/che
 
     # Install Helm dependencies
@@ -96,7 +95,7 @@ else
 
     # Install Che helm chart
     helm upgrade --install che --namespace $CHE_NAMESPACE \
-        --set cheImage=eclipse/che-server:7.0.0-RC-2.0 \
+        --set cheImage=eclipse/che-server:7.0.0 \
         --set global.ingressDomain=$INGRESS_DOMAIN \
         --set global.cheWorkspacesNamespace=$CHE_NAMESPACE \
         --set global.cheWorkspaceClusterRole=eclipse-codewind \
