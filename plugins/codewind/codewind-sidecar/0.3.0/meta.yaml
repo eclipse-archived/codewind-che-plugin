@@ -11,7 +11,7 @@
 
 id: codewind-sidecar
 apiVersion: v2
-version: latest
+version: 0.3.0
 type: Che Plugin
 name: CodewindPlugin
 title: CodewindPlugin
