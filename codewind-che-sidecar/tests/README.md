@@ -14,7 +14,6 @@ Tests for verifying Codewind and sidecar container functionality in a Che enviro
 - [BATS Bash testing environment](https://github.com/bats-core/bats-core)
 - `curl` [tool](https://curl.haxx.se/)
 - `jq` json parsing [tool](https://stedolan.github.io/jq/)
-- `yq` yaml parsing [tool](https://github.com/mikefarah/yq)
  
 ## Running the tests
 

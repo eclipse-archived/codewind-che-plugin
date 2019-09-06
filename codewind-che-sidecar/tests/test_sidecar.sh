@@ -17,7 +17,7 @@ if [[ ($# -ne 2) || ( -z "$1" ) || ( -z "$2" ) ]]; then
     exit 1
 fi
 
-neededtools=("curl" "kubectl" "bats" "jq" "yq")
+neededtools=("curl" "kubectl" "bats" "jq")
 for i in "${neededtools[@]}"; do
   if ! [ -x "$(command -v $i)" ]; then
     echo "Error: $i is not installed." >&2
