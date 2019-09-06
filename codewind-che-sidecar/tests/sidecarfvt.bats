@@ -50,11 +50,11 @@ teardown() {
     echo "# Test time taken: " $(($time_after-$time_before)) " seconds" >&3
 }
 
-@test "Codewind Sidecar Test #1: Create Che workspace from Codewind dev file" {
+@test "Codewind Sidecar Test 1: Create Che workspace from Codewind dev file" {
     createCodewindCheWorkspace
 }
 
-@test "Codewind Sidecar Test #2: Verify Codewind workspace pod is running" {
+@test "Codewind Sidecar Test 2: Verify Codewind workspace pod is running" {
     # Check if pod has started, timeout after 10 minutes
     endtime=$(($SECONDS + 600))
     pod_running=false
@@ -75,7 +75,7 @@ teardown() {
     [ $pod_running = "true" ]
 }
 
-@test "Codewind Sidecar Test #3: Verify sidecar container is running and ready, and Codewind service successfully deployed" {
+@test "Codewind Sidecar Test 3: Verify sidecar container is running and ready, and Codewind service successfully deployed" {
     # Check if sidecar main processes have started after codewind server deployment, timeout after 10 minutes
     endtime=$(($SECONDS + 600))
     nginx_process_running=false
@@ -110,7 +110,7 @@ teardown() {
     [ ! -z "$cw_service_name" ]
 }
 
-@test "Codewind Sidecar Test #4: Verify filewatcher daemon is up & running" {
+@test "Codewind Sidecar Test 4: Verify filewatcher daemon is up & running" {
     # Check that the filewatcher daemon properly started, timeout after 2 minutes
     endtime=$(($SECONDS + 120))
     filewatcherd_ready=false
@@ -125,7 +125,7 @@ teardown() {
     [ $filewatcherd_ready = "true" ]
 }
 
-@test "Codewind Sidecar Test #5: Verify filewatcher daemon restarts after kill" {
+@test "Codewind Sidecar Test 5: Verify filewatcher daemon restarts after kill" {
     time_before_kill=$SECONDS
 
     # Kill filewatcherd process in the sidecar container
@@ -156,7 +156,7 @@ teardown() {
     checkFilewatcherDaemonRunning "$time_elapsed"
 }
 
-@test "Codewind Sidecar Test #6: Verify sidecar container restarts after nginx kill" {
+@test "Codewind Sidecar Test 6: Verify sidecar container restarts after nginx kill" {
     # Capture current # of restarts of sidecar container
     container_restarts_current=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].restartCount}" $KUBE_NAMESPACE_ARG)
 
@@ -183,7 +183,7 @@ teardown() {
     [ $sidecar_ready = "true" ]
 }
 
-@test "Codewind Sidecar Test #7: Stop and delete the Codewind Che workspace" {
+@test "Codewind Sidecar Test 7: Stop and delete the Codewind Che workspace" {
     # Delete temporary file housing the workspace ID
     if [ -f che_workspace_id.txt ]; then
         rm che_workspace_id.txt
