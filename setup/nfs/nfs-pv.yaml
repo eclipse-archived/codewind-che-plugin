@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: che-data
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  nfs:
+    server: <ip-address>
+    path: "/nfs/codewind/data"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: che-workspace1
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  nfs:
+    server: <ip-address>
+    path: "/nfs/codewind/workspace1"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: che-workspace2
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  nfs:
+    server: <ip-address>
+    path: "/nfs/codewind/workspace2"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: che-workspace3
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  nfs:
+    server: <ip-address>
+    path: "/nfs/codewind/workspace3"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: che-workspace4
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  nfs:
+    server: <ip-address>
+    path: "/nfs/codewind/workspace4"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: che-workspace5
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  nfs:
+    server: <ip-address>
+    path: "/nfs/codewind/workspace5"
