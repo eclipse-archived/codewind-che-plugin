@@ -16,10 +16,7 @@ metadata:
 components:
   - alias: theia-ide
     type: cheEditor
-    id: eclipse/che-theia/7.0.0-rc-4.0
-  - alias: exec-plugin
-    type: chePlugin
-    id: eclipse/che-machine-exec-plugin/0.0.1
+    id: eclipse/che-theia/7.1.0
   - alias: codewind-sidecar
     type: chePlugin
     id: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-sidecar/latest/meta.yaml
