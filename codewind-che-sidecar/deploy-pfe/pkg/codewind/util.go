@@ -3,6 +3,7 @@ package codewind
 import (
 	"encoding/json"
 	"os"
+	"strconv"
 
 	"deploy-pfe/pkg/constants"
 
@@ -105,6 +106,10 @@ func setPFEEnvVars(codewind Codewind) []corev1.EnvVar {
 		{
 			Name:  "CHE_INGRESS_HOST",
 			Value: codewind.Ingress,
+		},
+		{
+			Name:  "ON_OPENSHIFT",
+			Value: strconv.FormatBool(codewind.OnOpenShift),
 		},
 	}
 }

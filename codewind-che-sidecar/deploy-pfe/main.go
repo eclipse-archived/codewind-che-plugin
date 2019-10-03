@@ -81,6 +81,9 @@ func main() {
 	// Retrieve the images for PFE and Performance dashboard
 	pfe, performance := codewind.GetImages()
 
+	// Determine if we're running on OpenShift or not.
+	onOpenShift := kube.DetectOpenShift3(config)
+
 	// Create the Codewind deployment object
 	codewindInstance := codewind.Codewind{
 		PFEName:            constants.PFEPrefix + cheWorkspaceID,
@@ -96,6 +99,7 @@ func main() {
 		OwnerReferenceUID:  ownerReferenceUID,
 		Privileged:         true,
 		Ingress:            constants.PFEPrefix + "-" + cheWorkspaceID + "-" + cheIngress,
+		OnOpenShift:        onOpenShift,
 	}
 
 	// Patch the Che workspace service account
@@ -112,9 +116,8 @@ func main() {
 	}
 
 	// Expose Codewind over an ingress or route
-	isOpenShift := kube.DetectOpenShift3(config)
-	if isOpenShift {
-		// Deploy a route instead on OpenShift 3.x
+	if onOpenShift {
+		// Deploy a route instead on OpenShift
 		route := codewind.CreateRoute(codewindInstance)
 		routev1client, err := routev1.NewForConfig(config)
 		if err != nil {
