@@ -82,7 +82,7 @@ func main() {
 	pfe, performance := codewind.GetImages()
 
 	// Determine if we're running on OpenShift or not.
-	onOpenShift := kube.DetectOpenShift3(config)
+	onOpenShift := kube.DetectOpenShift(config)
 
 	// Create the Codewind deployment object
 	codewindInstance := codewind.Codewind{

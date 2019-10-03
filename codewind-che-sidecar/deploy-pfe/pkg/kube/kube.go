@@ -31,9 +31,9 @@ func GetCurrentNamespace() string {
 	return namespace
 }
 
-// DetectOpenShift3 determines if we're running on an OpenShift 3.x cluster
+// DetectOpenShift determines if we're running on an OpenShift cluster
 // From https://github.com/eclipse/che-operator/blob/2f639261d8b5416b2934591e12925ee0935814dd/pkg/util/util.go#L63
-func DetectOpenShift3(config *rest.Config) bool {
+func DetectOpenShift(config *rest.Config) bool {
 	discoveryClient, err := discovery.NewDiscoveryClientForConfig(config)
 	if err != nil {
 		log.Errorf("Unable to detect if running on OpenShift: %v\n", err)
