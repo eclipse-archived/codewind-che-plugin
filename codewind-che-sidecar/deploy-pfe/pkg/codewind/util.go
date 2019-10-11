@@ -12,6 +12,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	extensionsv1 "k8s.io/api/extensions/v1beta1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -380,6 +381,33 @@ func CreateIngress(codewind Codewind) extensionsv1.Ingress {
 							},
 						},
 					},
+				},
+			},
+		},
+	}
+}
+
+// GeneratePVC creates a persistent volume claim for PFE
+func generatePVC(codewind Codewind, volumeSize string) corev1.PersistentVolumeClaim {
+	labels := map[string]string{
+		"app":               constants.PFEPrefix,
+		"codewindWorkspace": codewind.WorkspaceID,
+	}
+
+	return corev1.PersistentVolumeClaim{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "PersistentVolumeClaim",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:   codewind.PVCName,
+			Labels: labels,
+		},
+		Spec: corev1.PersistentVolumeClaimSpec{
+			AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteMany},
+			Resources: corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{
+					corev1.ResourceStorage: resource.MustParse(volumeSize),
 				},
 			},
 		},

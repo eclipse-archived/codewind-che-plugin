@@ -18,6 +18,9 @@ const (
 	// PFEImageTag is the image tag associated with the docker image that's used for Codewind-PFE
 	PFEImageTag = "latest"
 
+	// PFEVolumeSize is the size of the volume to use for PFE
+	PFEVolumeSize = "1Gi"
+
 	// PerformanceTag is the image tag associated with the docker image that's used for the Performance dashboard
 	PerformanceTag = "latest"
 

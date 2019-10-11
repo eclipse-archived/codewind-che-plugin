@@ -55,10 +55,6 @@ func main() {
 		}
 	}
 
-	// Retrieve the PVC that's used for the workspace projects
-	workspacePVC := che.GetWorkspacePVC(clientset, namespace, cheWorkspaceID)
-	log.Infof("PVC: %s\n", workspacePVC)
-
 	// Get the ingress domain used for Che (and Che workspaces)
 	cheIngress, err := che.GetCheIngress(os.Getenv("CHE_API"))
 	if err != nil {
@@ -88,11 +84,11 @@ func main() {
 	codewindInstance := codewind.Codewind{
 		PFEName:            constants.PFEPrefix + cheWorkspaceID,
 		PFEImage:           pfe,
+		PVCName:            constants.PFEPrefix + cheWorkspaceID,
 		PerformanceName:    constants.PerformancePrefix + cheWorkspaceID,
 		PerformanceImage:   performance,
 		Namespace:          namespace,
 		WorkspaceID:        cheWorkspaceID,
-		PVCName:            workspacePVC,
 		ServiceAccountName: serviceAccountName,
 		PullSecret:         secretName,
 		OwnerReferenceName: ownerReferenceName,
