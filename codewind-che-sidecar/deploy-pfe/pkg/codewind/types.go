@@ -10,9 +10,9 @@ type Codewind struct {
 	PerformanceImage   string
 	Namespace          string
 	WorkspaceID        string
-	PVCName            string
 	ServiceAccountName string
 	PullSecret         string
+	PVCName            string
 	OwnerReferenceName string
 	OwnerReferenceUID  types.UID
 	Privileged         bool

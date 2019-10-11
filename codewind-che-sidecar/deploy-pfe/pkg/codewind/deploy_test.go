@@ -16,7 +16,6 @@ func setupCodewind() Codewind {
 		PerformanceImage:   constants.PerformanceImage + ":" + constants.PerformanceTag,
 		Namespace:          "default",
 		WorkspaceID:        cheWorkspaceID,
-		PVCName:            "claim-che-workspace",
 		ServiceAccountName: "che-workspace",
 		PullSecret:         "workspace1erok6723m74axkg-registry-secrets",
 		OwnerReferenceName: "codewind",

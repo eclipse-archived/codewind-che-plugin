@@ -13,12 +13,20 @@ import (
 
 // DeployCodewind takes in a `codewind` object and deploys Codewind and the performance dashboard into the specified namespace
 func DeployCodewind(clientset *kubernetes.Clientset, codewind Codewind, namespace string) error {
+	// Create a PVC for PFE
+	pvc := generatePVC(codewind, constants.PFEVolumeSize)
+	_, err := clientset.CoreV1().PersistentVolumeClaims(namespace).Create(&pvc)
+	if err != nil {
+		log.Errorf("Unable to create Persistent Volume Claim for PFE: %v\n", err)
+		return err
+	}
+
 	// Deploy Codewind PFE
 	service := createPFEService(codewind)
 	deploy := createPFEDeploy(codewind)
 
 	log.Infoln("Deploying Codewind...")
-	_, err := clientset.CoreV1().Services(namespace).Create(&service)
+	_, err = clientset.CoreV1().Services(namespace).Create(&service)
 	if err != nil {
 		log.Errorf("Unable to create Codewind service: %v\n", err)
 		return err
