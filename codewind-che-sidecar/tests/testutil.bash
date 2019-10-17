@@ -19,7 +19,7 @@ function createCodewindCheWorkspace() {
     fi
 
     # Create Che workspace based on latest Codewind .yaml devfile converted to json
-    local HTTP_RESPONSE=$(curl $CODEWIND_DEVFILE_URL | curl --silent --write-out "HTTPSTATUS:%{http_code}" --request POST --header "Content-Type:text/yaml" --data-binary @- $CHE_INGRESS_DOMAIN_URL/api/workspace/devfile?start-after-create=true)
+    local HTTP_RESPONSE=$(curl $CODEWIND_DEVFILE_URL | curl --silent --write-out "HTTPSTATUS:%{http_code}" --request POST --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --header "Content-Type:text/yaml" --data-binary @- $CHE_INGRESS_DOMAIN_URL/api/workspace/devfile?start-after-create=true)
 
     local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -35,7 +35,7 @@ function createCodewindCheWorkspace() {
 
 # Stop the Codewind Che workspace
 function stopCodewindCheWorkspace() {
-    local HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/$CHE_WORKSPACE_ID/runtime)
+    local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/$CHE_WORKSPACE_ID/runtime)
 
     local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -51,7 +51,7 @@ function stopCodewindCheWorkspace() {
 
 # Delete the Codewind Che workspace
 function deleteCodewindCheWorkspace() {
-   local HTTP_RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/$CHE_WORKSPACE_ID)
+   local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/$CHE_WORKSPACE_ID)
 
    local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
    local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
