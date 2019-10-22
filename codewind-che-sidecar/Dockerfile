@@ -22,7 +22,7 @@ WORKDIR /go/deploy-pfe
 COPY ./deploy-pfe/ .
 RUN make && make test
 
-# Pull the CW CLI from download.eclispe.org, based on branch
+# Pull the CW CLI from download.eclipse.org, based on branch
 
 COPY scripts/ /scripts
 
