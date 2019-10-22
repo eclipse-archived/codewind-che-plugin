@@ -74,6 +74,6 @@ while sleep 10; do
         exit 1
     fi
     if [ $FILEWATCHERD_PROCESS_STATUS -ne 0 ]; then
-        filewatcherd $CWServiceNameEndpoint &
+        filewatcherd $CWServiceNameEndpoint "/usr/local/bin/cwctl" &
     fi
 done

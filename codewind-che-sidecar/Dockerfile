@@ -22,6 +22,19 @@ WORKDIR /go/deploy-pfe
 COPY ./deploy-pfe/ .
 RUN make && make test
 
+# Pull the CW CLI from download.eclispe.org, based on branch
+
+COPY scripts/ /scripts
+
+# Default to master
+ARG CW_CLI_BRANCH=master
+
+WORKDIR /cli
+
+RUN /scripts/cli-pull.sh
+
+# On success, the Linux cwctl is available from /cli/linux/cwctl
+
 # Build base image for the nginx based sidecar container
 FROM nginx:stable-alpine
 
@@ -30,6 +43,8 @@ RUN apk --no-cache add curl openssl jq
 # Copy the filewatcherd daemon and deploy-pfe over from the previous build stage
 COPY --from=builder /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/filewatcherd /usr/local/bin
 COPY --from=builder /go/deploy-pfe/deploy-pfe /usr/local/bin
+
+COPY --from=builder /cli/linux/cwctl /usr/local/bin/cwctl
 
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./site.conf /etc/nginx/conf.d-default/default.conf
@@ -43,7 +58,7 @@ RUN touch /var/run/nginx.pid
 
 # ownership and permissions set up on relvant files/folders for user www-data (uid=82) and group root (gid=0)
 RUN chown -R www-data:root /var/run/nginx.pid && \
-  chown -R www-data:root /var/cache/nginx && \ 
+  chown -R www-data:root /var/cache/nginx && \
   chown www-data:root /etc/nginx/conf.d /etc/nginx/nginx.conf /etc/nginx/conf.d-default/default.conf
 RUN chmod g+rwx /var/run/nginx.pid && \
   chmod -R g+rwx /var/cache/nginx && \
