@@ -394,6 +394,9 @@ func generatePVC(codewind Codewind, volumeSize string, storageClass string) core
 		"codewindWorkspace": codewind.WorkspaceID,
 	}
 
+	blockOwnerDeletion := true
+	controller := true
+
 	pvc := corev1.PersistentVolumeClaim{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
@@ -402,6 +405,16 @@ func generatePVC(codewind Codewind, volumeSize string, storageClass string) core
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   codewind.PVCName,
 			Labels: labels,
+			OwnerReferences: []metav1.OwnerReference{
+				{
+					APIVersion:         "apps/v1",
+					BlockOwnerDeletion: &blockOwnerDeletion,
+					Controller:         &controller,
+					Kind:               "ReplicaSet",
+					Name:               codewind.OwnerReferenceName,
+					UID:                codewind.OwnerReferenceUID,
+				},
+			},
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
 			AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteMany},

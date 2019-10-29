@@ -10,13 +10,13 @@ const (
 	PerformancePrefix = PFEPrefix + "-performance"
 
 	// PFEImage is the docker image that will be used in the Codewind-PFE pod
-	PFEImage = "eclipse/codewind-pfe-amd64"
+	PFEImage = "johncollier/codewind-pfe-amd64"
 
 	// PerformanceImage is the docker image that will be used in the Performance dashboard pod
 	PerformanceImage = "eclipse/codewind-performance-amd64"
 
 	// PFEImageTag is the image tag associated with the docker image that's used for Codewind-PFE
-	PFEImageTag = "latest"
+	PFEImageTag = "ingresstest"
 
 	// PFEVolumeSize is the size of the volume to use for PFE
 	PFEVolumeSize = "1Gi"
