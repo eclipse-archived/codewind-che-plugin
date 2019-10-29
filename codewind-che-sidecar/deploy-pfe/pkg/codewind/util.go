@@ -388,13 +388,13 @@ func CreateIngress(codewind Codewind) extensionsv1.Ingress {
 }
 
 // GeneratePVC creates a persistent volume claim for PFE
-func generatePVC(codewind Codewind, volumeSize string) corev1.PersistentVolumeClaim {
+func generatePVC(codewind Codewind, volumeSize string, storageClass string) corev1.PersistentVolumeClaim {
 	labels := map[string]string{
 		"app":               constants.PFEPrefix,
 		"codewindWorkspace": codewind.WorkspaceID,
 	}
 
-	return corev1.PersistentVolumeClaim{
+	pvc := corev1.PersistentVolumeClaim{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "v1",
 			Kind:       "PersistentVolumeClaim",
@@ -412,6 +412,13 @@ func generatePVC(codewind Codewind, volumeSize string) corev1.PersistentVolumeCl
 			},
 		},
 	}
+
+	// If a storage class was passed in, set it in the PVC
+
+	if storageClass != "" {
+		pvc.Spec.StorageClassName = &storageClass
+	}
+	return pvc
 }
 
 // GetImages returns the images that are to be used for PFE and the Performance dashboard in Codewind

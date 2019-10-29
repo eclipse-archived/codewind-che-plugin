@@ -7,6 +7,7 @@ import (
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/client-go/kubernetes"
 )
@@ -14,8 +15,16 @@ import (
 // DeployCodewind takes in a `codewind` object and deploys Codewind and the performance dashboard into the specified namespace
 func DeployCodewind(clientset *kubernetes.Clientset, codewind Codewind, namespace string) error {
 	// Create a PVC for PFE
-	pvc := generatePVC(codewind, constants.PFEVolumeSize)
-	_, err := clientset.CoreV1().PersistentVolumeClaims(namespace).Create(&pvc)
+	// Determine if we're running on OpenShift on IKS (and thus ned to use the ibm-file-bronze storage class)
+	storageClass := ""
+	sc, err := clientset.StorageV1().StorageClasses().Get(constants.ROKSStorageClass, metav1.GetOptions{})
+	if err == nil && sc != nil {
+		storageClass = sc.Name
+		log.Infof("Setting storage class to %s\n", storageClass)
+	}
+
+	pvc := generatePVC(codewind, constants.PFEVolumeSize, storageClass)
+	_, err = clientset.CoreV1().PersistentVolumeClaims(namespace).Create(&pvc)
 	if err != nil {
 		log.Errorf("Unable to create Persistent Volume Claim for PFE: %v\n", err)
 		return err
