@@ -55,7 +55,7 @@ fi
 echo "Started nginx"
 
 # Start filewatcherd process
-filewatcherd $CWServiceNameEndpoint &
+filewatcherd $CWServiceNameEndpoint "/usr/local/bin/cwctl" &
 status=$?
 if [ $status -ne 0 ]; then
     echo "Failed to start filewatcherd: $status"
@@ -74,6 +74,6 @@ while sleep 10; do
         exit 1
     fi
     if [ $FILEWATCHERD_PROCESS_STATUS -ne 0 ]; then
-        filewatcherd $CWServiceNameEndpoint &
+        filewatcherd $CWServiceNameEndpoint "/usr/local/bin/cwctl" &
     fi
 done
