@@ -32,4 +32,7 @@ const (
 
 	// PerformanceContainerPort is the port at which the Performance dashboard is exposed
 	PerformanceContainerPort = 9095
+
+	// ROKSStorageClass referencces the storage class to use on ROKS (OpenShift on IKS)
+	ROKSStorageClass = "ibmc-file-bronze"
 )
