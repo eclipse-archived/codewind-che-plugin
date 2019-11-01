@@ -37,7 +37,9 @@ pipeline {
 
                     git clone https://github.com/eclipse/codewind-filewatchers.git
 
-                    docker build --build-arg CW_CLI_BRANCH=$GIT_BRANCH  -t  codewind-che-sidecar .
+                    docker build --build-arg CW_CLI_BRANCH=master  -t  codewind-che-sidecar .
+
+                    # docker build --build-arg CW_CLI_BRANCH=$GIT_BRANCH  -t  codewind-che-sidecar .
                 '''
             }
         }
