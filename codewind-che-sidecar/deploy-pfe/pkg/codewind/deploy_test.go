@@ -12,6 +12,7 @@ func setupCodewind() Codewind {
 	return Codewind{
 		PFEName:            constants.PFEPrefix + cheWorkspaceID,
 		PFEImage:           constants.PFEImage + ":" + constants.PFEImageTag,
+		PVCName:            constants.PFEPrefix + "-" + cheWorkspaceID,
 		PerformanceName:    constants.PerformancePrefix + cheWorkspaceID,
 		PerformanceImage:   constants.PerformanceImage + ":" + constants.PerformanceTag,
 		Namespace:          "default",
