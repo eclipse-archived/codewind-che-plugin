@@ -35,11 +35,12 @@ pipeline {
                         rm -rf codewind-filewatchers
                     fi
 
+                    # If using a public feature branch, set the branch name in this file.
+                    script scripts/installer-branch-override.env
+
                     git clone https://github.com/eclipse/codewind-filewatchers.git
 
-                    docker build --build-arg CW_CLI_BRANCH=master  -t  codewind-che-sidecar .
-
-                    # docker build --build-arg CW_CLI_BRANCH=$GIT_BRANCH  -t  codewind-che-sidecar .
+                    docker build --build-arg CW_CLI_BRANCH=$GIT_BRANCH  -t  codewind-che-sidecar .
                 '''
             }
         }
