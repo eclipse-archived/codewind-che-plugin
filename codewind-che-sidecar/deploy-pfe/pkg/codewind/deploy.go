@@ -15,7 +15,7 @@ import (
 // DeployCodewind takes in a `codewind` object and deploys Codewind and the performance dashboard into the specified namespace
 func DeployCodewind(clientset *kubernetes.Clientset, codewind Codewind, namespace string) error {
 	// Create a PVC for PFE
-	// Determine if we're running on OpenShift on IKS (and thus ned to use the ibm-file-bronze storage class)
+	// Determine if we're running on OpenShift on IKS (and thus need to use the ibm-file-bronze storage class)
 	storageClass := ""
 	sc, err := clientset.StorageV1().StorageClasses().Get(constants.ROKSStorageClass, metav1.GetOptions{})
 	if err == nil && sc != nil {
