@@ -84,7 +84,7 @@ func main() {
 	codewindInstance := codewind.Codewind{
 		PFEName:            constants.PFEPrefix + cheWorkspaceID,
 		PFEImage:           pfe,
-		PVCName:            constants.PFEPrefix + cheWorkspaceID,
+		PVCName:            constants.PFEPrefix + "-" + cheWorkspaceID,
 		PerformanceName:    constants.PerformancePrefix + cheWorkspaceID,
 		PerformanceImage:   performance,
 		Namespace:          namespace,
