@@ -40,7 +40,8 @@ pipeline {
 
                     git clone https://github.com/eclipse/codewind-filewatchers.git
 
-                    docker build --build-arg CW_CLI_BRANCH=$GIT_BRANCH  -t  codewind-che-sidecar .
+                    # We use --no-cache here because we are consuming cwctl from an external resource (which we should never cache)
+                    docker build --no-cache --build-arg CW_CLI_BRANCH=$GIT_BRANCH  -t  codewind-che-sidecar .
                 '''
             }
         }
