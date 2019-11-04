@@ -29,4 +29,7 @@ fi
 
 git clone https://github.com/eclipse/codewind-filewatchers.git
 
-docker build -t codewind-che-sidecar .
+# If using a public feature branch, set the branch name in this file.
+source scripts/installer-branch-override.env
+
+docker build --build-arg CW_CLI_BRANCH="$GIT_BRANCH" -t codewind-che-sidecar .
