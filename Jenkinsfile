@@ -36,7 +36,7 @@ pipeline {
                     fi
 
                     # If using a public feature branch, set the branch name in this file.
-                    script scripts/installer-branch-override.env
+                    source scripts/installer-branch-override.env
 
                     git clone https://github.com/eclipse/codewind-filewatchers.git
 
