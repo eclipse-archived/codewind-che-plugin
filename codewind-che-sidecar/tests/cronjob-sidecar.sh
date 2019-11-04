@@ -51,6 +51,7 @@ if [[ (-z $DASHBOARD_IP) ]]; then
 fi
 
 oc login $CLUSTER_IP:8443 -u $CLUSTER_USER -p $CLUSTER_PASSWORD
+oc project $NAMESPACE
 if [[ $? -eq 0 ]]; then
   echo -e "${GREEN}Successfully logged into the OKD cluster ${RESET}\n"
 else
