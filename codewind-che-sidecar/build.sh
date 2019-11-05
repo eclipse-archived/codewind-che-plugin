@@ -27,15 +27,28 @@ if [ -d "codewind-filewatchers" ]; then
   rm -rf codewind-filewatchers
 fi
 
+INSTALLER_REPO="https://github.com/eclipse/codewind-installer.git"
+BRANCH_NAME=`git rev-parse --abbrev-ref HEAD`
+
 git clone https://github.com/eclipse/codewind-filewatchers.git
 
+BLUE='\033[1;34m'
+NC='\033[0m'
+
+printf "\n${BLUE}Warning: Verify that the installer target branch below is the branch you expect to be targeting with your build${NC}\n"
+sleep 1
+
 # the command below will echo the head commit if the branch exists, else it just exits
-if [[ -n \$(git ls-remote --heads \$INSTALLER_REPO ${env.BRANCH_NAME}) ]]; then
-    echo "Will use matching ${env.BRANCH_NAME} branch on \$INSTALLER_REPO"
-    export CW_CLI_BRANCH=${env.BRANCH_NAME}
+if [[ -n $(git ls-remote --heads $INSTALLER_REPO ${BRANCH_NAME}) ]]; then
+    echo "Will use matching ${BRANCH_NAME} branch on $INSTALLER_REPO"
+    export CW_CLI_BRANCH=${BRANCH_NAME}
 else
-    echo "No matching branch on \$INSTALLER_REPO - using \$CW_CLI_BRANCH branch"
+    export CW_CLI_BRANCH=master
+    source scripts/installer-branch-override.env
+    echo "No matching branch on $INSTALLER_REPO - using $CW_CLI_BRANCH branch. Override this in installer-branch-override.env"
 fi
 
+
+echo
 
 docker build --build-arg CW_CLI_BRANCH="$CW_CLI_BRANCH" -t codewind-che-sidecar .
