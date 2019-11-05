@@ -19,7 +19,7 @@ pipeline {
             steps {
                 // NOTE: change of this sh call should be in sync with  
                 //       './scripts/build.sh' and './codewind-che-sidecar/build.sh'. 
-                sh '''#!/usr/bin/env bash
+                sh """#!/usr/bin/env bash
                     echo "Starting build the Codewind Che plugin sidecar container..."
                     set -eu
 
@@ -53,7 +53,7 @@ pipeline {
 
                     # We use --no-cache here because we are consuming cwctl from an external resource (which we should never cache)
                     docker build --no-cache --build-arg CW_CLI_BRANCH=$CW_CLI_BRANCH  -t  codewind-che-sidecar .
-                '''
+                """
             }
         }
         
