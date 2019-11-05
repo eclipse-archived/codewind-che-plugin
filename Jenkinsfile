@@ -35,6 +35,8 @@ pipeline {
                         rm -rf codewind-filewatchers
                     fi
                     
+                    printenv
+                    
                     export INSTALLER_REPO="https://github.com/eclipse/codewind-installer.git"
                     export CW_CLI_BRANCH=master
 
