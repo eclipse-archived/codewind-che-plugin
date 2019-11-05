@@ -38,13 +38,13 @@ pipeline {
                     export INSTALLER_REPO="https://github.com/eclipse/codewind-installer.git"
                     export CW_CLI_BRANCH=master
 
-                    # the command below will echo the head commit if the branch exists, else it just exits
-                    if [[ -n \$(git ls-remote --heads \$INSTALLER_REPO ${env.BRANCH_NAME}) ]]; then
-                        echo "Will use matching ${env.BRANCH_NAME} branch on \$INSTALLER_REPO"
-                        export CW_CLI_BRANCH=${env.BRANCH_NAME}
-                    else
-                        echo "No matching branch on \$INSTALLER_REPO - using \$CW_CLI_BRANCH branch"
-                    fi
+                        # the command below will echo the head commit if the branch exists, else it just exits
+                        if [[ -n \$(git ls-remote --heads \$INSTALLER_REPO ${env.BRANCH_NAME}) ]]; then
+                            echo "Will use matching ${env.BRANCH_NAME} branch on \$INSTALLER_REPO"
+                            export CW_CLI_BRANCH=${env.BRANCH_NAME}
+                        else
+                            echo "No matching branch on \$INSTALLER_REPO - using \$CW_CLI_BRANCH branch"
+                        fi
 
                     git clone https://github.com/eclipse/codewind-filewatchers.git
 
