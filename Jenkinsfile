@@ -43,7 +43,7 @@ pipeline {
                         echo "Will use matching ${BRANCH_NAME} branch on \$INSTALLER_REPO"
                         export CW_CLI_BRANCH=${BRANCH_NAME}
                     else
-                        echo "No matching branch on \$INSTALLER_REPO (of ${BRANCH_NAME})- using \$CW_CLI_BRANCH branch"
+                        echo "No matching branch on \$INSTALLER_REPO (of ${BRANCH_NAME}) - using \$CW_CLI_BRANCH branch"
                     fi
                     
                     git clone https://github.com/eclipse/codewind-filewatchers.git
