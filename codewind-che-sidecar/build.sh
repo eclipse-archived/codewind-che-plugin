@@ -29,7 +29,13 @@ fi
 
 git clone https://github.com/eclipse/codewind-filewatchers.git
 
-# If using a public feature branch, set the branch name in this file.
-source scripts/installer-branch-override.env
+# the command below will echo the head commit if the branch exists, else it just exits
+if [[ -n \$(git ls-remote --heads \$INSTALLER_REPO ${env.BRANCH_NAME}) ]]; then
+    echo "Will use matching ${env.BRANCH_NAME} branch on \$INSTALLER_REPO"
+    export CW_CLI_BRANCH=${env.BRANCH_NAME}
+else
+    echo "No matching branch on \$INSTALLER_REPO - using \$CW_CLI_BRANCH branch"
+fi
 
-docker build --build-arg CW_CLI_BRANCH="$GIT_BRANCH" -t codewind-che-sidecar .
+
+docker build --build-arg CW_CLI_BRANCH="$CW_CLI_BRANCH" -t codewind-che-sidecar .

@@ -35,13 +35,18 @@ pipeline {
                         rm -rf codewind-filewatchers
                     fi
 
-                    # If using a public feature branch, set the branch name in this file.
-                    source scripts/installer-branch-override.env
+                    # the command below will echo the head commit if the branch exists, else it just exits
+                    if [[ -n \$(git ls-remote --heads \$INSTALLER_REPO ${env.BRANCH_NAME}) ]]; then
+                        echo "Will use matching ${env.BRANCH_NAME} branch on \$INSTALLER_REPO"
+                        export CW_CLI_BRANCH=${env.BRANCH_NAME}
+                    else
+                        echo "No matching branch on \$INSTALLER_REPO - using \$CW_CLI_BRANCH branch"
+                    fi
 
                     git clone https://github.com/eclipse/codewind-filewatchers.git
 
                     # We use --no-cache here because we are consuming cwctl from an external resource (which we should never cache)
-                    docker build --no-cache --build-arg CW_CLI_BRANCH=$GIT_BRANCH  -t  codewind-che-sidecar .
+                    docker build --no-cache --build-arg CW_CLI_BRANCH=$CW_CLI_BRANCH  -t  codewind-che-sidecar .
                 '''
             }
         }
