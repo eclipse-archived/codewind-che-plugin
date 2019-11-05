@@ -34,6 +34,8 @@ pipeline {
                     if [ -d "codewind-filewatchers" ]; then
                         rm -rf codewind-filewatchers
                     fi
+                    
+                    echo JGW test: ${env.BRANCH_NAME}
 
                     export INSTALLER_REPO="https://github.com/eclipse/codewind-installer.git"
                     export CW_CLI_BRANCH=master
