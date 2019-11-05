@@ -35,7 +35,7 @@ pipeline {
                         rm -rf codewind-filewatchers
                     fi
                     
-                    echo JGW test: '${env.BRANCH_NAME}'
+                    echo JGW test: $BRANCH_NAME
                     echo post JGW test
 
                     git clone https://github.com/eclipse/codewind-filewatchers.git
