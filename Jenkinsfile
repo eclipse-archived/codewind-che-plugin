@@ -34,12 +34,24 @@ pipeline {
                     if [ -d "codewind-filewatchers" ]; then
                         rm -rf codewind-filewatchers
                     fi
+                    
+                    export INSTALLER_REPO="https://github.com/eclipse/codewind-installer.git"
+                    export CW_CLI_BRANCH=master
 
+                    # the command below will echo the head commit if the branch exists, else it just exits
+                    if [[ -n \$(git ls-remote --heads \$INSTALLER_REPO ${BRANCH_NAME}) ]]; then
+                        echo "Will use matching ${BRANCH_NAME} branch on \$INSTALLER_REPO"
+                        export CW_CLI_BRANCH=${BRANCH_NAME}
+                    else
+                        # Optionally, we could use CHANGE_TARGET here, if defined, which contains the branch name of the PR target (eg master).
+
+                        echo "No matching branch on \$INSTALLER_REPO (of ${BRANCH_NAME}) - using \$CW_CLI_BRANCH branch"
+                    fi
+                    
                     git clone https://github.com/eclipse/codewind-filewatchers.git
 
-                    docker build --build-arg CW_CLI_BRANCH=master  -t  codewind-che-sidecar .
-
-                    # docker build --build-arg CW_CLI_BRANCH=$GIT_BRANCH  -t  codewind-che-sidecar .
+                    # We use --no-cache here because we are consuming cwctl from an external resource (which we should never cache)
+                    docker build --no-cache --build-arg CW_CLI_BRANCH=$CW_CLI_BRANCH  -t  codewind-che-sidecar .
                 '''
             }
         }
