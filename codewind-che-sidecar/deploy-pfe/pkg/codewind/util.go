@@ -388,14 +388,14 @@ func CreateIngress(codewind Codewind) extensionsv1.Ingress {
 }
 
 // GeneratePVC creates a persistent volume claim for PFE
-func generatePVC(codewind Codewind, volumeSize string, storageClass string) corev1.PersistentVolumeClaim {
+func generatePVC(codewind Codewind, volumeSize string, storageClass string, wsPVCName string, wsPVCUID types.UID) corev1.PersistentVolumeClaim {
 	labels := map[string]string{
 		"app":               constants.PFEPrefix,
 		"codewindWorkspace": codewind.WorkspaceID,
 	}
 
 	blockOwnerDeletion := true
-	controller := true
+	controller := false
 
 	pvc := corev1.PersistentVolumeClaim{
 		TypeMeta: metav1.TypeMeta{
@@ -407,12 +407,12 @@ func generatePVC(codewind Codewind, volumeSize string, storageClass string) core
 			Labels: labels,
 			OwnerReferences: []metav1.OwnerReference{
 				{
-					APIVersion:         "apps/v1",
+					APIVersion:         "v1",
 					BlockOwnerDeletion: &blockOwnerDeletion,
 					Controller:         &controller,
-					Kind:               "ReplicaSet",
-					Name:               codewind.OwnerReferenceName,
-					UID:                codewind.OwnerReferenceUID,
+					Kind:               "PersistentVolumeClaim",
+					Name:               wsPVCName,
+					UID:                wsPVCUID,
 				},
 			},
 		},

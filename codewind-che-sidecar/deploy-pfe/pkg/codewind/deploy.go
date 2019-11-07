@@ -1,9 +1,10 @@
 package codewind
 
 import (
-	log "github.com/sirupsen/logrus"
-
+	"deploy-pfe/pkg/che"
 	"deploy-pfe/pkg/constants"
+
+	log "github.com/sirupsen/logrus"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -14,20 +15,26 @@ import (
 
 // DeployCodewind takes in a `codewind` object and deploys Codewind and the performance dashboard into the specified namespace
 func DeployCodewind(clientset *kubernetes.Clientset, codewind Codewind, namespace string) error {
-	// Create a PVC for PFE
-	// Determine if we're running on OpenShift on IKS (and thus need to use the ibm-file-bronze storage class)
-	storageClass := ""
-	sc, err := clientset.StorageV1().StorageClasses().Get(constants.ROKSStorageClass, metav1.GetOptions{})
-	if err == nil && sc != nil {
-		storageClass = sc.Name
-		log.Infof("Setting storage class to %s\n", storageClass)
-	}
-
-	pvc := generatePVC(codewind, constants.PFEVolumeSize, storageClass)
-	_, err = clientset.CoreV1().PersistentVolumeClaims(namespace).Create(&pvc)
+	// See if a PVC for the PFE workspace already exists, if not, create one
+	_, err := clientset.CoreV1().PersistentVolumeClaims(namespace).Get(codewind.PVCName, metav1.GetOptions{})
 	if err != nil {
-		log.Errorf("Unable to create Persistent Volume Claim for PFE: %v\n", err)
-		return err
+		// Create a PVC for PFE
+		// Determine if we're running on OpenShift on IKS (and thus need to use the ibm-file-bronze storage class)
+		storageClass := ""
+		sc, err := clientset.StorageV1().StorageClasses().Get(constants.ROKSStorageClass, metav1.GetOptions{})
+		if err == nil && sc != nil {
+			storageClass = sc.Name
+			log.Infof("Setting storage class to %s\n", storageClass)
+		}
+
+		// Get the name and uid for the Che workspace volume
+		chePvc := che.GetWorkspacePVC(clientset, namespace, codewind.WorkspaceID)
+		pvc := generatePVC(codewind, constants.PFEVolumeSize, storageClass, chePvc.GetObjectMeta().GetName(), chePvc.GetObjectMeta().GetUID())
+		_, err = clientset.CoreV1().PersistentVolumeClaims(namespace).Create(&pvc)
+		if err != nil {
+			log.Errorf("Unable to create Persistent Volume Claim for PFE: %v\n", err)
+			return err
+		}
 	}
 
 	// Deploy Codewind PFE
