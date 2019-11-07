@@ -96,6 +96,7 @@ func main() {
 		Privileged:         true,
 		Ingress:            constants.PFEPrefix + "-" + cheWorkspaceID + "-" + cheIngress,
 		OnOpenShift:        onOpenShift,
+		CheIngress:         cheIngress,
 	}
 
 	// Patch the Che workspace service account

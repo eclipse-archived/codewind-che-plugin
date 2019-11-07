@@ -18,6 +18,7 @@ type Codewind struct {
 	Privileged         bool
 	Ingress            string
 	OnOpenShift        bool
+	CheIngress         string
 }
 
 // ServiceAccountPatch contains an array of imagePullSecrets that will be patched into a Kubernetes service account
