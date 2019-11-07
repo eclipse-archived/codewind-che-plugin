@@ -113,7 +113,7 @@ func setPFEEnvVars(codewind Codewind) []corev1.EnvVar {
 			Value: strconv.FormatBool(codewind.OnOpenShift),
 		},
 		{
-			Name:  "CHE_INGRESS_PREFIX",
+			Name:  "INGRESS_PREFIX",
 			Value: codewind.CheIngress,
 		},
 	}
