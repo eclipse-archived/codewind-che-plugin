@@ -27,8 +27,7 @@ deploy-pfe
 
 CWServiceName=$(deploy-pfe get-service)
 if [ -z $CWServiceName ]; then
-    echo "ERROR: The Codewind service was not found. Aborting..."
-    exit 1
+    echo "ERROR: The Codewind service was not found"
 fi
 
 echo "Codewind is now ready."
@@ -70,8 +69,8 @@ while sleep 10; do
     ps aux | grep filewatcherd | grep -q -v grep
     FILEWATCHERD_PROCESS_STATUS=$?
     if [ $NGINX_PROCESS_STATUS -ne 0 ]; then
-        echo "Nginx process failed"
-        exit 1
+        echo "Nginx process failed. Restarting..."
+        nginx -g "daemon on;"
     fi
     if [ $FILEWATCHERD_PROCESS_STATUS -ne 0 ]; then
         filewatcherd $CWServiceNameEndpoint "/usr/local/bin/cwctl" &
