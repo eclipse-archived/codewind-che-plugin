@@ -14,24 +14,22 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-// GetWorkspacePVC retrieves the PVC (Persistent Volume Claim) associated with the Che workspace we're deploying Codewind in
+// GetWorkspacePVC retrieves a PVC (Persistent Volume Claim) associated with the Che workspace we're deploying Codewind in
 func GetWorkspacePVC(clientset *kubernetes.Clientset, namespace string, cheWorkspaceID string) *corev1.PersistentVolumeClaim {
 	PVCs, err := clientset.CoreV1().PersistentVolumeClaims(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.workspace.volume_name=projects,che.workspace_id=" + cheWorkspaceID,
+		LabelSelector: "che.workspace_id=" + cheWorkspaceID,
 	})
 	if err != nil || PVCs == nil {
 		log.Errorf("Error, unable to retrieve PVCs: %v\n", err)
 		os.Exit(1)
 	} else if len(PVCs.Items) < 1 {
 		// We couldn't find the workspace PVC, so need to find an alternative.
-		PVCs, err = clientset.CoreV1().PersistentVolumeClaims(namespace).List(metav1.ListOptions{
-			LabelSelector: "che.workspace_id=" + cheWorkspaceID,
-		})
-		if err != nil || PVCs == nil || len(PVCs.Items) < 1 {
+		PVC, err := clientset.CoreV1().PersistentVolumeClaims(namespace).Get("claim-che-workspace", metav1.GetOptions{})
+		if err != nil || PVC == nil {
 			log.Errorf("Error, unable to retrieve PVCs: %v\n", err)
 			os.Exit(1)
 		} else {
-			return &PVCs.Items[0]
+			return PVC
 		}
 	}
 	return &PVCs.Items[0]
