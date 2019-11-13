@@ -49,18 +49,18 @@ nginx -g "daemon on;"
 status=$?
 if [ $status -ne 0 ]; then
     echo "Failed to start nginx: $status"
-    exit $status
+else
+    echo "Started nginx"
 fi
-echo "Started nginx"
 
 # Start filewatcherd process
 filewatcherd $CWServiceNameEndpoint "/usr/local/bin/cwctl" &
 status=$?
 if [ $status -ne 0 ]; then
     echo "Failed to start filewatcherd: $status"
-    exit $status
+else
+    echo "Started filewatcherd"
 fi
-echo "Started filewatcherd"
 
 # Monitor nginx and filewatcherd processes every 10 seconds, exit if any of the two fail
 while sleep 10; do
