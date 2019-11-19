@@ -16,6 +16,14 @@ pipeline {
     
     stages {
         stage('Build Docker image') {
+            // This when clause disables Tagged build
+            when {
+                beforeAgent true
+                not {
+                    buildingTag()
+                }
+            }
+
             steps {
                 // NOTE: change of this sh call should be in sync with  
                 //       './scripts/build.sh' and './codewind-che-sidecar/build.sh'. 
@@ -58,11 +66,16 @@ pipeline {
         
         stage('Publish Docker image') {
 
-            // This when clause disables PR build uploads; you may comment this out if you want your build uploaded.
+            // This when clause disables PR/Tag build uploads; you may comment this out if you want your build uploaded.
             when {
                 beforeAgent true
-                not {
-                    changeRequest()
+                allOf {
+                    not {
+                        changeRequest()
+                    }
+                    not {
+                        buildingTag()
+                    }
                 }
             }
 
