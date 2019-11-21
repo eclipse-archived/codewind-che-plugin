@@ -62,6 +62,42 @@ function deleteCodewindCheWorkspace() {
    fi
 }
 
+# Delete any existing Codewind Che workspaces
+function deleteExistingCodewindCheWorkspaces() {
+    # Get all Che Workspace IDs
+    local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request GET $CHE_INGRESS_DOMAIN_URL/api/workspace)
+    local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
+    local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+
+    if [[ $HTTP_STATUS = 200 ]]; then
+        # Get all Codewind Che workspaces IDs & iterate through them trying to stop and delete them
+        CHE_WORKSPACE_IDS=$(echo $HTTP_BODY | jq -r '.[] | select(.devfile.metadata.name=="codewind-che") | .id')
+        for i in ${CHE_WORKSPACE_IDS[@]}; do
+            echo -e "# ${BLUE}Codewind Workspace ID: ${i} ${RESET}\n" >&3
+
+            # Stop the Codewind Workspace
+            echo -e "# ${BLUE}Stopping the Codewind Workspace ${RESET}\n" >&3
+            HTTPSTATUS=$(curl -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/${i}/runtime 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+            if [[ $HTTPSTATUS -ne 204 ]]; then
+                echo -e "# ${RED}Codewind workspace has failed to stop or is already stopped. Will attempt to remove the workspace... ${RESET}\n" >&3
+            fi
+            # Wait for the workspace to stop before removing it, otherwise the workspace removal fails
+            echo -e "# ${BLUE}Sleeping for 10s to allow the workspace to stop before removing it ${RESET}\n"
+            sleep 10
+
+            # Remove the Codewind Workspace
+            echo -e "# ${BLUE}Removing the Codewind Workspace ${RESET}\n" >&3
+            HTTPSTATUS=$(curl -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/${i} 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+            if [[ $HTTPSTATUS -ne 204 ]]; then
+                echo -e "# ${RED}Codewind workspace has failed to be removed... ${RESET}\n" >&3
+                exit 1
+            fi
+
+            echo -e "# ${GREEN}Codewind should be removed momentarily... ${RESET}\n" >&3
+        done
+    fi
+}
+
 # Check for Codewind pod
 function getCodewindPod {
     kubectl get pods --selector=app=codewind-pfe --no-headers $KUBE_NAMESPACE_ARG | grep $CHE_WORKSPACE_ID
