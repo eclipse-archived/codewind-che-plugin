@@ -63,6 +63,7 @@ teardown() {
 }
 
 @test "Codewind Sidecar Test 1: Create Che workspace from Codewind dev file" {
+    deleteExistingCodewindCheWorkspaces
     createCodewindCheWorkspace
 }
 
