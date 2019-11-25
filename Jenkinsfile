@@ -82,15 +82,16 @@ pipeline {
                             echo "publish.sh eclipse $TAG"
                             ./scripts/publish.sh eclipse $TAG
 
-                            if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
-                                IFS='.' # set '.' as delimiter
-                                read -ra TOKENS <<< "$GIT_BRANCH"    
-                                IFS=' ' # reset delimiter
-                                export TAG_CUMULATIVE=${TOKENS[0]}.${TOKENS[1]}
+                            # NOTE: commented out to disable publishing cumulative iFix image until ready
+                            #if [[ $GIT_BRANCH =~ ^([0-9]+\\.[0-9]+) ]]; then
+                            #    IFS='.' # set '.' as delimiter
+                            #    read -ra TOKENS <<< "$GIT_BRANCH"    
+                            #    IFS=' ' # reset delimiter
+                            #    export TAG_CUMULATIVE=${TOKENS[0]}.${TOKENS[1]}
 
-                                echo "publish.sh eclipse $TAG_CUMULATIVE"
-                                ./scripts/publish.sh eclipse $TAG_CUMULATIVE                               
-                            fi
+                            #    echo "publish.sh eclipse $TAG_CUMULATIVE"
+                            #    ./scripts/publish.sh eclipse $TAG_CUMULATIVE                               
+                            #fi
                         else
                             echo "Skip publishing docker images for $GIT_BRANCH branch"
                         fi
