@@ -38,5 +38,5 @@ Options:
 
 3. Deploy a fresh che instance using the stable che version (che's latest release), set up a default docker registry but don't install codewind.
 ```
-./che-setup.sh --cluster-ip=<cluster_ip> --cluster-user=<cluster_user> --cluster-pass=<cluster_pass> --che-ns=che --che-version=next --clean-deploy --default-registry
+./che-setup.sh --cluster-ip=<cluster_ip> --cluster-user=<cluster_user> --cluster-pass=<cluster_pass> --che-ns=che --che-version=stable --clean-deploy --default-registry
 ```
