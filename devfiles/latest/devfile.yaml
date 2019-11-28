@@ -16,7 +16,7 @@ metadata:
 components:
   - alias: theia-ide
     type: cheEditor
-    id: eclipse/che-theia/nightly
+    id: eclipse/che-theia/7.3.1
     memoryLimit: 1024Mi
   - alias: codewind-sidecar
     type: chePlugin
