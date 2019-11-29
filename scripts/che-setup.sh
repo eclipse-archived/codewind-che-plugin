@@ -341,7 +341,11 @@ getEndpoints
 getCheAccessToken
 
 if [[ "$ADD_DEFAULT_REGISTRY" == "y" ]]; then
-    echo -e "${CYAN}> Setting docker registry in che ${RESET}"
+    OC_VERSION=$(oc version 2>&1)
+    if [[ "$OC_VERSION" =~ "Client Version: version.Info{Major:\"4\"" ]]; then
+        DEFAULT_REGISTRY="image-registry.openshift-image-registry.svc:5000"
+    fi
+    echo -e "${CYAN}> Setting docker registry in che: $DEFAULT_REGISTRY ${RESET}"
     ENCODED_TOKEN=$(oc get secret $(oc describe sa $SERVICE_ACCOUNT | tail -n 2 | head -n 1 | awk '{$1=$1};1') -o json | jq ".data.token")
     DECODED_TOKEN=$(echo "$ENCODED_TOKEN" | $base64Name -di)
     REGISTRY_CREDS={\""$DEFAULT_REGISTRY"\":{\"username\":\""$SERVICE_ACCOUNT"\",\"password\":\""$DECODED_TOKEN"\"}}
