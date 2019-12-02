@@ -1,0 +1,26 @@
+################################################################################
+# Copyright (c) 2019 IBM Corporation and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v2.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v20.html
+#
+# Contributors:
+#     IBM Corporation - initial API and implementation
+################################################################################
+
+---
+apiVersion: 1.0.0
+metadata:
+  name: codewind-che
+components:
+  - alias: theia-ide
+    type: cheEditor
+    id: eclipse/che-theia/7.3.1
+  - alias: codewind-sidecar
+    type: chePlugin
+    id: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.6.1/plugins/codewind/codewind-sidecar/0.6.1/meta.yaml
+  - alias: codewind-theia
+    type: chePlugin
+    id: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.6.1/plugins/codewind/codewind-theia/0.6.1/meta.yaml
+
