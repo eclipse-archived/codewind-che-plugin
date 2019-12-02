@@ -169,34 +169,7 @@ teardown() {
     checkFilewatcherDaemonRunning "$time_elapsed"
 }
 
-@test "Codewind Sidecar Test 6: Verify sidecar container restarts after nginx kill" {
-    # Capture current # of restarts of sidecar container
-    container_restarts_current=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].restartCount}" $KUBE_NAMESPACE_ARG)
-
-    # Kill nginx process in the sidecar container
-    fwd_pid=$(getPIDofProcessInContainer $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME nginx)
-    kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- kill $fwd_pid
-
-    # Wait a few seconds to let sidecar terminate
-    sleep 10
-
-    # Check every 5 seconds if sidecar container is started and ready, timeout after 5 minutes
-    endtime=$(($SECONDS + 600))
-    sidecar_ready=false
-    while (( $SECONDS < $endtime )); do
-        sleep 5
-        # Check that sidecar is started and ready, and has one more restart than before nginx was killed
-        run checkSidecarContainerReady "((container_restarts_current + 1))"
-        if [ "$status" -eq 0 ]; then
-            sidecar_ready=true
-            break
-        fi
-    done
-
-    [ $sidecar_ready = "true" ]
-}
-
-@test "Codewind Sidecar Test 7: Stop and delete the Codewind Che workspace" {
+@test "Codewind Sidecar Test 6: Stop and delete the Codewind Che workspace" {
     # Delete temporary file housing the workspace ID
     if [ -f che_workspace_id.txt ]; then
         rm che_workspace_id.txt
