@@ -6,7 +6,9 @@ pipeline {
     }
     
     triggers {	
-      issueCommentTrigger('trigger_build')	
+      issueCommentTrigger('trigger_build')
+      upstream(upstreamProjects: "Codewind/codewind-installer/${env.BRANCH_NAME}", threshold: hudson.model.Result.SUCCESS)
+      upstream(upstreamProjects: "Codewind/codewind-filewatchers/${env.BRANCH_NAME}", threshold: hudson.model.Result.SUCCESS)
     }
 
     options {
