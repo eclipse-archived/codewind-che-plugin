@@ -67,7 +67,7 @@ rm -rf $CODEWIND_CHE_PLUGIN_DIR \
 && mkdir -p $TEST_OUTPUT_DIR \
 && git clone $CODEWIND_CHE_PLUGIN_REPO -b $TEST_BRANCH \
 && cd $CODEWIND_CHE_PLUGIN_TEST_DIR \
-&& bats --tap sidecarfvt.bats > $TEST_OUTPUT_TAP \
+&& bats --tap sidecarfvt.bats 2>&1 | tee $TEST_OUTPUT_TAP \
 && cat $TEST_OUTPUT_TAP | tap-xunit > $TEST_OUTPUT_XML \
 && curl --header "Content-Type:text/xml" --data-binary @$TEST_OUTPUT_XML --insecure "https://$DASHBOARD_IP/postxmlresult/$BUCKET_NAME/test" > /dev/null \
 && rm -rf $CODEWIND_CHE_PLUGIN_DIR
