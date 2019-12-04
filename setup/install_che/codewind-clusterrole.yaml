@@ -30,11 +30,7 @@ rules:
 
 - apiGroups: [""]
   resources: ["secrets"]
-<<<<<<< HEAD
   verbs: ["get", "list", "create", "watch", "delete", "patch", "update"]
-=======
-  verbs: ["get", "list", "create", "watch", "delete"]
->>>>>>> Update RBAC for secret resource - delete
 
 - apiGroups: [""]
   resources: ["serviceaccounts"]
