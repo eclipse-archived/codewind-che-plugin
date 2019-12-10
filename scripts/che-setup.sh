@@ -368,7 +368,7 @@ if [[ "$INSTALL_CW" == "y" ]]; then
     removeCodewindWorkspace
     displayMsg $? "Failed to remove existing codewind workspace." true
 
-    HTTPSTATUS=$(curl -s $DEFAULT_DEVFILE | curl -s --header "Content-Type: text/yaml" --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request POST --data-binary @- -D- -o/dev/null $CHE_ENDPOINT/api/workspace/devfile?start-after-create=true 2>/dev/null | head -n 1 | cut -d ' ' -f2)
+    HTTPSTATUS=$(curl -s $DEFAULT_DEVFILE | curl -s --header "Content-Type: text/yaml" --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request POST --data-binary @- -D- -o/dev/null $CHE_ENDPOINT/api/workspace/devfile?start-after-create=true 2>/dev/null | sed -n 3p | cut -d ' ' -f2)
     if [[ $HTTPSTATUS -ne 201 ]]; then
         displayMsg 1 "Codewind workspace setup has failed." true
     fi
