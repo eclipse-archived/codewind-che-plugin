@@ -59,7 +59,7 @@ else
   exit 1
 fi
 
-export CHE_INGRESS_DOMAIN=che-$NAMESPACE.$CLUSTER_IP.nip.io
+export CHE_INGRESS_DOMAIN=$(kubectl get routes --selector=component=che -o jsonpath="{.items[0].spec.host}" 2>&1)
 export CHE_NAMESPACE=$NAMESPACE
 export CLUSTER_IP
 
