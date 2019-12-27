@@ -18,8 +18,6 @@ load testutil
 setup() {
     export time_before=$SECONDS
 
-    echo "INGRESS DOMAIN IS: $CHE_INGRESS_DOMAIN"
-
     if [ -z "$CHE_INGRESS_DOMAIN" ]; then
         echo "# Che ingress domain is not defined in " '$CHE_INGRESS_DOMAIN' >&3
         exit 1
@@ -36,10 +34,7 @@ setup() {
     fi
 
     export CODEWIND_DEVFILE_URL=https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml
-    export CHE_INGRESS_DOMAIN_URL=http://$CHE_INGRESS_DOMAIN
     export KUBE_NAMESPACE_ARG="-n $CHE_NAMESPACE"
-
-    echo "INGRESS DOMAIN URL IS: $CHE_INGRESS_DOMAIN_URL"
 
     # Discover workspace ID written into temporary file during workspace creation
     if [ -f che_workspace_id.txt ]; then
