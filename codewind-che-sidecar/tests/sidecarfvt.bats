@@ -18,6 +18,8 @@ load testutil
 setup() {
     export time_before=$SECONDS
 
+    echo "INGRESS DOMAIN IS: $CHE_INGRESS_DOMAIN"
+
     if [ -z "$CHE_INGRESS_DOMAIN" ]; then
         echo "# Che ingress domain is not defined in " '$CHE_INGRESS_DOMAIN' >&3
         exit 1
@@ -36,6 +38,8 @@ setup() {
     export CODEWIND_DEVFILE_URL=https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml
     export CHE_INGRESS_DOMAIN_URL=http://$CHE_INGRESS_DOMAIN
     export KUBE_NAMESPACE_ARG="-n $CHE_NAMESPACE"
+
+    echo "INGRESS DOMAIN URL IS: $CHE_INGRESS_DOMAIN_URL"
 
     # Discover workspace ID written into temporary file during workspace creation
     if [ -f che_workspace_id.txt ]; then
@@ -65,116 +69,4 @@ teardown() {
 @test "Codewind Sidecar Test 1: Create Che workspace from Codewind dev file" {
     deleteExistingCodewindCheWorkspaces
     createCodewindCheWorkspace
-}
-
-@test "Codewind Sidecar Test 2: Verify Codewind workspace pod is running" {
-    # Check if pod has started, timeout after 10 minutes
-    endtime=$(($SECONDS + 600))
-    pod_running=false
-    while (( $SECONDS < $endtime )); do
-        run getCodewindPod
-        if [[ $output = *"Running"* ]]; then
-            pod_running=true
-            break
-        fi
-        if [[ $output = *"Failure"* || $output = *"Unknown"* || $output = *"ImagePullBackOff"* || $output = *"CrashLoopBackOff"* || $output = *"PostStartHookError"* ]]; then
-            echo "# Error: Codewind pod failed to start" >&3
-            exit 1
-        fi
-    
-        sleep 2
-    done
-    
-    [ $pod_running = "true" ]
-}
-
-@test "Codewind Sidecar Test 3: Verify sidecar container is running and ready, and Codewind service successfully deployed" {
-    # Check if sidecar main processes have started after codewind server deployment, timeout after 10 minutes
-    endtime=$(($SECONDS + 600))
-    nginx_process_running=false
-    filewatcherd_process_running=false
-    while (( $SECONDS < $endtime )); do
-        run getPIDofProcessInContainer $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME nginx
-        if [ "$status" -eq 0 ]; then
-            nginx_process_running=true
-        fi
-
-        run getPIDofProcessInContainer $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME filewatcherd
-        if [ "$status" -eq 0 ]; then
-            filewatcherd_process_running=true
-        fi
-
-        if [[ $nginx_process_running = "true" && $filewatcherd_process_running = "true" ]]; then
-            break
-        fi
-
-        sleep 2
-    done
-
-    [ $nginx_process_running = "true" ]
-    [ $filewatcherd_process_running = "true" ]
-
-    # Allow some more time for sidecar container to settle
-    sleep 30
-
-    checkSidecarContainerReady
-
-    cw_service_name=$(kubectl get svc --selector=app=codewind-pfe,codewindWorkspace=$CHE_WORKSPACE_ID -o jsonpath="{.items[0].metadata.name}" $KUBE_NAMESPACE_ARG)
-    [ ! -z "$cw_service_name" ]
-}
-
-@test "Codewind Sidecar Test 4: Verify filewatcher daemon is up & running" {
-    # Check that the filewatcher daemon properly started, timeout after 2 minutes
-    endtime=$(($SECONDS + 120))
-    filewatcherd_ready=false
-    while (( $SECONDS < $endtime )); do
-        run checkFilewatcherDaemonRunning
-        if [ "$status" -eq 0 ]; then 
-            filewatcherd_ready=true
-            break
-        fi
-    done
-
-    [ $filewatcherd_ready = "true" ]
-}
-
-@test "Codewind Sidecar Test 5: Verify filewatcher daemon restarts after kill" {
-    time_before_kill=$SECONDS
-
-    # Kill filewatcherd process in the sidecar container
-    fwd_pid=$(getPIDofProcessInContainer $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME filewatcherd)
-    kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- kill $fwd_pid
-
-    # Check every 5 seconds if filewatcherd has restarted, timeout after 5 minutes
-    endtime=$(($SECONDS + 300))
-    fwd_restarted=false
-    while (( $SECONDS < $endtime )); do
-        sleep 5
-        run getFileWatcherDaemonProcess
-        if [ "$status" -eq 0 ]; then
-            fwd_restarted=true
-            break
-        fi
-    done
-        
-    [ $fwd_restarted = "true" ]
-
-    # Allow some time for filewatcherd to settle
-    sleep 10
-
-    # Calculate approx time elapsed (in seconds) between filewatcher daemon kill and restart so as to only check the logs during that time
-    time_elapsed="$(($SECONDS - $time_before_kill))"
-
-    # Check if the filewatcher daemon started properly
-    checkFilewatcherDaemonRunning "$time_elapsed"
-}
-
-@test "Codewind Sidecar Test 6: Stop and delete the Codewind Che workspace" {
-    # Delete temporary file housing the workspace ID
-    if [ -f che_workspace_id.txt ]; then
-        rm che_workspace_id.txt
-    fi
-
-    stopCodewindCheWorkspace
-    deleteCodewindCheWorkspace
 }

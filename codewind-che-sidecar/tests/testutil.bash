@@ -24,6 +24,9 @@ function createCodewindCheWorkspace() {
     local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
 
+    echo ">> HTTP response is: $HTTP_RESPONSE"
+    echo "\n>> HTTP STATUS is: $HTTP_STATUS"
+
     if [[ $HTTP_STATUS != 201 ]]; then
         echo "# Error creating Che Codewind workspace [HTTP status: $HTTP_STATUS]" >&3
         exit 1
