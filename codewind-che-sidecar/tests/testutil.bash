@@ -24,9 +24,6 @@ function createCodewindCheWorkspace() {
     local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
 
-    echo ">> HTTP response is: $HTTP_RESPONSE"
-    echo "\n>> HTTP STATUS is: $HTTP_STATUS"
-
     if [[ $HTTP_STATUS != 201 ]]; then
         echo "# Error creating Che Codewind workspace [HTTP status: $HTTP_STATUS]" >&3
         exit 1
@@ -103,7 +100,7 @@ function deleteExistingCodewindCheWorkspaces() {
 
 # Check for Codewind pod
 function getCodewindPod {
-    kubectl get pods --selector=app=codewind-pfe --no-headers $KUBE_NAMESPACE_ARG | grep $CHE_WORKSPACE_ID
+    kubectl get pods --selector=app=codewind-pfe --no-headers -n $KUBE_NAMESPACE_ARG | grep $CHE_WORKSPACE_ID
 }
 
 # Get PID of process within a pod's container
@@ -112,7 +109,7 @@ function getCodewindPod {
 #       $2 (required): container full name
 #       $3 (required): process name
 function getPIDofProcessInContainer {
-    kubectl exec -t $1 $KUBE_NAMESPACE_ARG --container $2 -- pidof $3
+    kubectl exec -t $1 -n $KUBE_NAMESPACE_ARG --container $2 -- pidof $3
 }
 
 # Examine sidecar container logs for specific filewatcher daemon messages to indicate successful start
@@ -124,13 +121,13 @@ function checkFilewatcherDaemonRunning {
     fi
 
     # Check sidecar logs for specific filewatcher daemon messages indicating successful start
-    kubectl logs $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME $KUBE_NAMESPACE_ARG $since_arg | grep -E "Successfully connected to w(s){1,2}\:\/\/"
-    kubectl logs $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME $KUBE_NAMESPACE_ARG $since_arg | grep -E "GET request completed, for http(s){0,1}\:\/\/"
+    kubectl logs $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME -n $KUBE_NAMESPACE_ARG $since_arg | grep -E "Successfully connected to w(s){1,2}\:\/\/"
+    kubectl logs $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME -n $KUBE_NAMESPACE_ARG $since_arg | grep -E "GET request completed, for http(s){0,1}\:\/\/"
 }
 
 # Check sidecar container for filewatcher daemon process
 function getFileWatcherDaemonProcess {
-    kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- ps aux | grep filewatcherd
+    kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME -n $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- ps aux | grep filewatcherd
 }
 
 # Check if sidecar container is started and in ready state
@@ -138,8 +135,8 @@ function getFileWatcherDaemonProcess {
 #       $1 (optional): # of restarts the container should have as a minimum (if unset don't check restart count)
 function checkSidecarContainerReady {
      # Examine kubernetes pod metadata for sidecar state
-    container_ready=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].ready}" $KUBE_NAMESPACE_ARG)
-    container_restarts=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].restartCount}" $KUBE_NAMESPACE_ARG)
+    container_ready=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].ready}" -n $KUBE_NAMESPACE_ARG)
+    container_restarts=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].restartCount}" -n $KUBE_NAMESPACE_ARG)
 
     [ $container_ready = "true" ]
 
