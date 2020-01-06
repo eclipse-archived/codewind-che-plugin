@@ -5,6 +5,7 @@ default: bin
 
 .PHONY: bin
 bin:
+	dep ensure -v
 	CGO_ENABLED=0 go build ${BUILD_FLAGS} -o deploy-pfe
 
 .PHONY: test
