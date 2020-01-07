@@ -12,14 +12,17 @@
 # First use this layer to build the go version of filewatcherd
 FROM golang:1.12 as builder
 
+# Install Dep
+RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
 # Pull down any dependencies and build the filewatcher daemon go app
 WORKDIR /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/
 COPY ./codewind-filewatchers/Filewatcherd-Go/src/codewind/ .
 RUN GOPATH= CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filewatcherd .
 
 # Build the pfe-deploy utility
-WORKDIR /go/deploy-pfe
-COPY ./deploy-pfe/ .
+WORKDIR /go/src/deploy-pfe
+COPY ./src/deploy-pfe/ .
 RUN make && make test
 
 # Pull the CW CLI from download.eclipse.org, based on branch
@@ -42,7 +45,7 @@ RUN apk --no-cache add curl openssl jq
 
 # Copy the filewatcherd daemon and deploy-pfe over from the previous build stage
 COPY --from=builder /go/src/github.com/eclipse/codewind-filewatchers/Filewatcherd-Go/filewatcherd /usr/local/bin
-COPY --from=builder /go/deploy-pfe/deploy-pfe /usr/local/bin
+COPY --from=builder /go/src/deploy-pfe/deploy-pfe /usr/local/bin
 
 COPY --from=builder /cli/linux/cwctl /usr/local/bin/cwctl
 
