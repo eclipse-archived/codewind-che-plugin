@@ -9,12 +9,11 @@
 #     IBM Corporation - initial API and implementation
 ################################################################################
 
-id: codewind-sidecar
 apiVersion: v2
 version: latest
 type: Che Plugin
-name: CodewindPlugin
-title: CodewindPlugin
+name: codewind-sidecar
+title: Codewind Che Sidecar
 description: Enables iterative development and deployment in Che
 icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
 publisher: eclipse
