@@ -19,7 +19,7 @@ function createCodewindCheWorkspace() {
     fi
 
     # Create Che workspace based on latest Codewind .yaml devfile converted to json
-    local HTTP_RESPONSE=$(curl $CODEWIND_DEVFILE_URL | curl --silent --write-out "HTTPSTATUS:%{http_code}" --request POST --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --header "Content-Type:text/yaml" --data-binary @- $CHE_INGRESS_DOMAIN_URL/api/workspace/devfile?start-after-create=true)
+    local HTTP_RESPONSE=$(curl $CODEWIND_DEVFILE_URL | curl --silent --write-out "HTTPSTATUS:%{http_code}" --request POST --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --header "Content-Type:text/yaml" --data-binary @- $CHE_INGRESS_DOMAIN/api/workspace/devfile?start-after-create=true)
 
     local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -35,7 +35,7 @@ function createCodewindCheWorkspace() {
 
 # Stop the Codewind Che workspace
 function stopCodewindCheWorkspace() {
-    local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/$CHE_WORKSPACE_ID/runtime)
+    local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request DELETE $CHE_INGRESS_DOMAIN/api/workspace/$CHE_WORKSPACE_ID/runtime)
 
     local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -51,7 +51,7 @@ function stopCodewindCheWorkspace() {
 
 # Delete the Codewind Che workspace
 function deleteCodewindCheWorkspace() {
-   local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/$CHE_WORKSPACE_ID)
+   local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request DELETE $CHE_INGRESS_DOMAIN/api/workspace/$CHE_WORKSPACE_ID)
 
    local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
    local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -65,7 +65,7 @@ function deleteCodewindCheWorkspace() {
 # Delete any existing Codewind Che workspaces
 function deleteExistingCodewindCheWorkspaces() {
     # Get all Che Workspace IDs
-    local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request GET $CHE_INGRESS_DOMAIN_URL/api/workspace)
+    local HTTP_RESPONSE=$(curl --silent --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --write-out "HTTPSTATUS:%{http_code}" --request GET $CHE_INGRESS_DOMAIN/api/workspace)
     local HTTP_BODY=$(echo $HTTP_RESPONSE | sed -e 's/HTTPSTATUS\:.*//g')
     local HTTP_STATUS=$(echo $HTTP_RESPONSE | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
 
@@ -77,7 +77,7 @@ function deleteExistingCodewindCheWorkspaces() {
 
             # Stop the Codewind Workspace
             echo -e "# ${BLUE}Stopping the Codewind Workspace ${RESET}\n" >&3
-            HTTPSTATUS=$(curl -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/${i}/runtime 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+            HTTPSTATUS=$(curl -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_INGRESS_DOMAIN/api/workspace/${i}/runtime 2>/dev/null | head -n 1 | cut -d$' ' -f2)
             if [[ $HTTPSTATUS -ne 204 ]]; then
                 echo -e "# ${RED}Codewind workspace has failed to stop or is already stopped. Will attempt to remove the workspace... ${RESET}\n" >&3
             fi
@@ -87,7 +87,7 @@ function deleteExistingCodewindCheWorkspaces() {
 
             # Remove the Codewind Workspace
             echo -e "# ${BLUE}Removing the Codewind Workspace ${RESET}\n" >&3
-            HTTPSTATUS=$(curl -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_INGRESS_DOMAIN_URL/api/workspace/${i} 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+            HTTPSTATUS=$(curl -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_INGRESS_DOMAIN/api/workspace/${i} 2>/dev/null | head -n 1 | cut -d$' ' -f2)
             if [[ $HTTPSTATUS -ne 204 ]]; then
                 echo -e "# ${RED}Codewind workspace has failed to be removed... ${RESET}\n" >&3
                 exit 1
@@ -100,7 +100,7 @@ function deleteExistingCodewindCheWorkspaces() {
 
 # Check for Codewind pod
 function getCodewindPod {
-    kubectl get pods --selector=app=codewind-pfe --no-headers $KUBE_NAMESPACE_ARG | grep $CHE_WORKSPACE_ID
+    kubectl get pods --selector=app=codewind-pfe --no-headers -n $KUBE_NAMESPACE_ARG | grep $CHE_WORKSPACE_ID
 }
 
 # Get PID of process within a pod's container
@@ -109,7 +109,7 @@ function getCodewindPod {
 #       $2 (required): container full name
 #       $3 (required): process name
 function getPIDofProcessInContainer {
-    kubectl exec -t $1 $KUBE_NAMESPACE_ARG --container $2 -- pidof $3
+    kubectl exec -t $1 -n $KUBE_NAMESPACE_ARG --container $2 -- pidof $3
 }
 
 # Examine sidecar container logs for specific filewatcher daemon messages to indicate successful start
@@ -121,13 +121,13 @@ function checkFilewatcherDaemonRunning {
     fi
 
     # Check sidecar logs for specific filewatcher daemon messages indicating successful start
-    kubectl logs $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME $KUBE_NAMESPACE_ARG $since_arg | grep -E "Successfully connected to w(s){1,2}\:\/\/"
-    kubectl logs $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME $KUBE_NAMESPACE_ARG $since_arg | grep -E "GET request completed, for http(s){0,1}\:\/\/"
+    kubectl logs $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME -n $KUBE_NAMESPACE_ARG $since_arg | grep -E "Successfully connected to w(s){1,2}\:\/\/"
+    kubectl logs $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME -n $KUBE_NAMESPACE_ARG $since_arg | grep -E "GET request completed, for http(s){0,1}\:\/\/"
 }
 
 # Check sidecar container for filewatcher daemon process
 function getFileWatcherDaemonProcess {
-    kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- ps aux | grep filewatcherd
+    kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME -n $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- ps aux | grep filewatcherd
 }
 
 # Check if sidecar container is started and in ready state
@@ -135,8 +135,8 @@ function getFileWatcherDaemonProcess {
 #       $1 (optional): # of restarts the container should have as a minimum (if unset don't check restart count)
 function checkSidecarContainerReady {
      # Examine kubernetes pod metadata for sidecar state
-    container_ready=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].ready}" $KUBE_NAMESPACE_ARG)
-    container_restarts=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].restartCount}" $KUBE_NAMESPACE_ARG)
+    container_ready=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].ready}" -n $KUBE_NAMESPACE_ARG)
+    container_restarts=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath="{.status.containerStatuses[?(@.name==\"$SIDECAR_CONTAINER_FULLNAME\")].restartCount}" -n $KUBE_NAMESPACE_ARG)
 
     [ $container_ready = "true" ]
 

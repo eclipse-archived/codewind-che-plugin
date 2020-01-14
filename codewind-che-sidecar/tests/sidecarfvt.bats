@@ -34,8 +34,7 @@ setup() {
     fi
 
     export CODEWIND_DEVFILE_URL=https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml
-    export CHE_INGRESS_DOMAIN_URL=http://$CHE_INGRESS_DOMAIN
-    export KUBE_NAMESPACE_ARG="-n $CHE_NAMESPACE"
+    export KUBE_NAMESPACE_ARG=${CHE_NAMESPACE}
 
     # Discover workspace ID written into temporary file during workspace creation
     if [ -f che_workspace_id.txt ]; then
@@ -45,13 +44,13 @@ setup() {
     fi
 
     # Discover workspace pod and sidecar full names based on workspace ID
-    export CHE_WORKSPACE_POD_FULLNAME=$(kubectl get pods -l che.original_name=che-workspace-pod --no-headers -o custom-columns=":metadata.name" $KUBE_NAMESPACE_ARG | grep $CHE_WORKSPACE_ID)
-    export SIDECAR_CONTAINER_FULLNAME=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath='{.spec.containers[*].name}' $KUBE_NAMESPACE_ARG | sed 's/ /\n/g' | grep ^codewind-che-sidecar)
+    export CHE_WORKSPACE_POD_FULLNAME=$(kubectl get pods -l che.original_name=che-workspace-pod --no-headers -o custom-columns=":metadata.name" -n $KUBE_NAMESPACE_ARG | grep $CHE_WORKSPACE_ID)
+    export SIDECAR_CONTAINER_FULLNAME=$(kubectl get pods $CHE_WORKSPACE_POD_FULLNAME -o jsonpath='{.spec.containers[*].name}' -n $KUBE_NAMESPACE_ARG | sed 's/ /\n/g' | grep ^codewind-che-sidecar)
 
     # Set up Che access token for multi-user Che environment
     CHE_USER="admin"
     CHE_PASS="admin"
-    KEYCLOAK_HOSTNAME=keycloak-"$CHE_NAMESPACE"."$CLUSTER_IP".nip.io
+    KEYCLOAK_HOSTNAME=$(kubectl get routes --selector=component=keycloak -o jsonpath="{.items[0].spec.host}" 2>&1)
     TOKEN_ENDPOINT="http://${KEYCLOAK_HOSTNAME}/auth/realms/che/protocol/openid-connect/token" 
     export CHE_ACCESS_TOKEN=$(curl -sSL --data "grant_type=password&client_id=che-public&username=${CHE_USER}&password=${CHE_PASS}" ${TOKEN_ENDPOINT} | jq -r '.access_token')
 }
@@ -119,7 +118,7 @@ teardown() {
 
     checkSidecarContainerReady
 
-    cw_service_name=$(kubectl get svc --selector=app=codewind-pfe,codewindWorkspace=$CHE_WORKSPACE_ID -o jsonpath="{.items[0].metadata.name}" $KUBE_NAMESPACE_ARG)
+    cw_service_name=$(kubectl get svc --selector=app=codewind-pfe,codewindWorkspace=$CHE_WORKSPACE_ID -o jsonpath="{.items[0].metadata.name}" -n $KUBE_NAMESPACE_ARG)
     [ ! -z "$cw_service_name" ]
 }
 
@@ -143,7 +142,7 @@ teardown() {
 
     # Kill filewatcherd process in the sidecar container
     fwd_pid=$(getPIDofProcessInContainer $CHE_WORKSPACE_POD_FULLNAME $SIDECAR_CONTAINER_FULLNAME filewatcherd)
-    kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- kill $fwd_pid
+    kubectl exec -t $CHE_WORKSPACE_POD_FULLNAME -n $KUBE_NAMESPACE_ARG --container $SIDECAR_CONTAINER_FULLNAME -- kill $fwd_pid
 
     # Check every 5 seconds if filewatcherd has restarted, timeout after 5 minutes
     endtime=$(($SECONDS + 300))
