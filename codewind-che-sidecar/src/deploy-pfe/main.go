@@ -67,10 +67,6 @@ func main() {
 	serviceAccountName := che.GetWorkspaceServiceAccount(clientset, namespace, cheWorkspaceID)
 	log.Infof("Service Account: %s\n", serviceAccountName)
 
-	// Get the name of the secret containing the workspace's registry secrets
-	secretName := che.GetWorkspaceRegistrySecret(clientset, namespace, cheWorkspaceID)
-	log.Infof("Registry Secret: %s\n", secretName)
-
 	// Get the Owner reference name and uid
 	ownerReferenceName, ownerReferenceUID := che.GetOwnerReferences(clientset, namespace, cheWorkspaceID)
 
@@ -90,20 +86,12 @@ func main() {
 		Namespace:          namespace,
 		WorkspaceID:        cheWorkspaceID,
 		ServiceAccountName: serviceAccountName,
-		PullSecret:         secretName,
 		OwnerReferenceName: ownerReferenceName,
 		OwnerReferenceUID:  ownerReferenceUID,
 		Privileged:         true,
 		Ingress:            constants.PFEPrefix + "-" + cheWorkspaceID + "-" + cheIngress,
 		OnOpenShift:        onOpenShift,
 		CheIngress:         cheIngress,
-	}
-
-	// Patch the Che workspace service account
-	err = codewind.PatchServiceAccount(clientset, codewindInstance)
-	if err != nil {
-		log.Errorf("Error: Unable to patch Che workspace service account: %v\n", err)
-		os.Exit(1)
 	}
 
 	err = codewind.DeployCodewind(clientset, codewindInstance, namespace)
