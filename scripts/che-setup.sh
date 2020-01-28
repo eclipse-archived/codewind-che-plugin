@@ -303,20 +303,6 @@ echo -e "${CYAN}> Applying tekton role binding${RESET}"
 kubectl apply -f "$CODEWIND_CHE/setup/install_che/codewind-tektonbinding.yaml" -n $CHE_NS > /dev/null 2>&1
 displayMsg $? "Failed to apply tekton role binding." true
 
-cd "$CODEWIND_ODO_EXTENSION/setup"
-echo -e "${CYAN}> Performing setup before applying ODO roles${RESET}"
-./setup.sh > /dev/null 2>&1
-displayMsg $? "Failed to perform setup on ODO roles." true
-cd $CURR_DIR
-
-echo -e "${CYAN}> Applying kubectl ODO cluster role${RESET}"
-kubectl apply -f "$CODEWIND_ODO_EXTENSION/setup/codewind-odoclusterrole.yaml" -n $CHE_NS > /dev/null 2>&1
-displayMsg $? "Failed to apply kubectl ODO cluster role." true
-
-echo -e "${CYAN}> Applying kubectl ODO role binding${RESET}"
-kubectl apply -f "$CODEWIND_ODO_EXTENSION/setup/codewind-odorolebinding.yaml" -n $CHE_NS > /dev/null 2>&1
-displayMsg $? "Failed to apply kubectl ODO role binding." true
-
 echo -e "${CYAN}> Setting openshift admin policy: privileged ${RESET}"
 oc adm policy add-scc-to-group privileged system:serviceaccounts:$CHE_NS > /dev/null 2>&1
 displayMsg $? "Failed to set admin policy: privileged." true
@@ -396,3 +382,9 @@ if [[ "$INSTALL_CW" == "y" ]]; then
         echo -e -n "${YELLOW}.${RESET}"
     done
 fi
+
+cd "$CODEWIND_ODO_EXTENSION/setup"
+echo -e "\n${CYAN}> Performing setup before applying ODO roles${RESET}"
+./setup.sh > /dev/null 2>&1
+displayMsg $? "Failed to perform setup on ODO roles." true
+cd $CURR_DIR
