@@ -41,7 +41,7 @@ func GetWorkspaceServiceAccount(clientset *kubernetes.Clientset, namespace strin
 
 	// Retrieve the workspace service account labeled with the Che Workspace ID
 	workspacePod, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.original_name=che-workspace-pod,che.workspace_id=" + cheWorkspaceID,
+		LabelSelector: "che.workspace_id=" + cheWorkspaceID,
 	})
 	if err != nil || workspacePod == nil {
 		log.Errorf("Error retrieving the Che workspace pod %v\n", err)
@@ -84,7 +84,7 @@ func GetOwnerReferences(clientset *kubernetes.Clientset, namespace string, cheWo
 	var ownerReferenceUID types.UID
 
 	workspacePod, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.original_name=che-workspace-pod,che.workspace_id=" + cheWorkspaceID,
+		LabelSelector: "che.workspace_id=" + cheWorkspaceID,
 	})
 	if err != nil {
 		log.Errorf("Error: Unable to retrieve the workspace pod %v\n", err)
