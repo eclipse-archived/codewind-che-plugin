@@ -16,13 +16,13 @@ const (
 	PerformanceImage = "eclipse/codewind-performance-amd64"
 
 	// PFEImageTag is the image tag associated with the docker image that's used for Codewind-PFE
-	PFEImageTag = "latest"
+	PFEImageTag = "0.9.0"
 
 	// PFEVolumeSize is the size of the volume to use for PFE
 	PFEVolumeSize = "1Gi"
 
 	// PerformanceTag is the image tag associated with the docker image that's used for the Performance dashboard
-	PerformanceTag = "latest"
+	PerformanceTag = "0.9.0"
 
 	// ImagePullPolicy is the pull policy used for all containers in Codewind, defaults to Always
 	ImagePullPolicy = corev1.PullAlways
