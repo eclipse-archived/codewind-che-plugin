@@ -28,9 +28,16 @@ if [[ (-z $NAMESPACE) ]]; then
   echo -e "${RED}Please export variable NAMESPACE to run the Codewind sidecar tests. ${RESET}\n"
   exit 1
 fi
+
 if [[ (-z $CLUSTER_IP) ]]; then
   echo -e "${RED}Mandatory argument CLUSTER_IP is not set up. ${RESET}\n"
   echo -e "${RED}Please export variable CLUSTER_IP to run the Codewind sidecar tests. ${RESET}\n"
+  exit 1
+fi
+
+if [[ (-z $CLUSTER_PORT) ]]; then
+  echo -e "${RED}Mandatory argument CLUSTER_PORT is not set up. ${RESET}\n"
+  echo -e "${RED}Please export variable CLUSTER_PORT to run the Codewind sidecar tests. ${RESET}\n"
   exit 1
 fi
 
@@ -50,7 +57,7 @@ if [[ (-z $DASHBOARD_IP) ]]; then
   exit 1
 fi
 
-oc login $CLUSTER_IP:8443 -u $CLUSTER_USER -p $CLUSTER_PASSWORD
+oc login $CLUSTER_IP:$CLUSTER_PORT -u $CLUSTER_USER -p $CLUSTER_PASSWORD
 oc project $NAMESPACE
 if [[ $? -eq 0 ]]; then
   echo -e "${GREEN}Successfully logged into the OKD cluster ${RESET}\n"
