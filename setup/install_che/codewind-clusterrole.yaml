@@ -71,7 +71,7 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: codewind-rolebinding
+  name: eclipse-codewind
 subjects:
 - kind: ServiceAccount
   name: codewind
