@@ -34,7 +34,7 @@ rules:
 
 - apiGroups: [""]
   resources: ["serviceaccounts"]
-  verbs: ["get", "patch"]
+  verbs: ["get", "patch", "create"]
 
 - apiGroups: [""]
   resources: ["services"]
@@ -49,7 +49,7 @@ rules:
   verbs: ["*"]
 
 - apiGroups: ["apps", "extensions"]
-  resources: ["deployments"]
+  resources: ["deployments", "deployments/finalizers"]
   verbs: ["watch", "get", "list", "create", "update", "delete", "patch"]
 
 - apiGroups: ["extensions", "apps"]
@@ -67,3 +67,15 @@ rules:
 - apiGroups: ["route.openshift.io"]
   resources: ["routes", "routes/custom-host"]
   verbs: ["get", "list", "create", "delete", "watch", "patch", "update"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: eclipse-codewind
+subjects:
+- kind: ServiceAccount
+  name: codewind
+roleRef:
+  kind: ClusterRole
+  name: eclipse-codewind
+  apiGroup: rbac.authorization.k8s.io
