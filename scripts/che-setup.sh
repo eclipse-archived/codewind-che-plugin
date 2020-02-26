@@ -291,10 +291,6 @@ echo -e "${CYAN}> Applying codewind cluster roles${RESET}"
 kubectl apply -f "$CODEWIND_CHE/setup/install_che/codewind-clusterrole.yaml" -n $CHE_NS > /dev/null 2>&1
 displayMsg $? "Failed to apply codewind cluster role." true
 
-echo -e "${CYAN}> Applying codewind role binding${RESET}"
-kubectl apply -f "$CODEWIND_CHE/setup/install_che/codewind-rolebinding.yaml" -n $CHE_NS > /dev/null 2>&1
-displayMsg $? "Failed to apply codewind role binding." true
-
 echo -e "${CYAN}> Applying tekton cluster roles${RESET}"
 kubectl apply -f "$CODEWIND_CHE/setup/install_che/codewind-tektonrole.yaml" -n $CHE_NS > /dev/null 2>&1
 displayMsg $? "Failed to apply tekton cluster role." true
