@@ -24,4 +24,4 @@ firstPublicationDate: "2019-05-30"
 latestUpdateDate: "2019-06-26"
 spec:
   extensions:
-    - http://download.eclipse.org/codewind/codewind-vscode/master/latest/codewind-theia.vsix
+    - http://download.eclipse.org/codewind/codewind-vscode/master/latest/codewind-che.vsix
