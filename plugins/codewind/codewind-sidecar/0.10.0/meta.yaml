@@ -20,7 +20,7 @@ publisher: eclipse
 repository: https://github.com/eclipse/codewind-che-plugin
 category: Other
 firstPublicationDate: "2019-05-30"
-latestUpdateDate: "2019-03-05"
+latestUpdateDate: "2020-03-05"
 spec:
   containers:
   - name: codewind-che-sidecar
