@@ -10,7 +10,7 @@
 ################################################################################
 
 apiVersion: v2
-version: 0.8.0
+version: 0.10.0
 type: Che Plugin
 name: codewind-sidecar
 title: Codewind Che Sidecar
@@ -20,11 +20,11 @@ publisher: eclipse
 repository: https://github.com/eclipse/codewind-che-plugin
 category: Other
 firstPublicationDate: "2019-05-30"
-latestUpdateDate: "2019-01-09"
+latestUpdateDate: "2020-03-05"
 spec:
   containers:
   - name: codewind-che-sidecar
-    image: eclipse/codewind-che-sidecar:0.8.0
+    image: eclipse/codewind-che-sidecar:0.10.0
     volumes:
       - mountPath: "/projects"
         name: projects
