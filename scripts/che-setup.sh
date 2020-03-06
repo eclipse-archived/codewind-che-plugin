@@ -45,6 +45,7 @@ DEFAULT_DEVFILE="https://raw.githubusercontent.com/eclipse/codewind-che-plugin/m
 USER_DEVFILE=
 DEFAULT_OPERATOR=
 OPERATOR_IMAGE=
+SSL_STATUS="-k"
 
 function usage {
     me=$(basename $0)
@@ -66,6 +67,7 @@ Options:
     --podwaittimeout    Pod wait timeout - default: 1200000
     --default-registry  Enable this flag to add the default docker registry - default: n
     --install-codewind  Enable this flag to install codewind from a devfile - default: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/devfiles/latest/devfile.yaml
+    --disable-ssl       Disables ssl for che version <= 7.9.0 to use http - default: y
     -h | --help         Display the man page
 EOF
 }
@@ -98,11 +100,16 @@ function installChe() {
     displayMsg $? "Failed to clean deploy che." true
 }
 
+function checkForCodewindPod {
+    CW_POD="$( kubectl get po --selector=app=codewind-pfe --show-labels 2>/dev/null | tail -n 1 )"
+}
+
 function removeCodewindWorkspace() {
     echo -e "${YELLOW}>> Cleaning up existing codewind workspace ${RESET}"
 
     # Get the Codewind Workspace ID
-    CW_POD="$( kubectl get po --selector=app=codewind-pfe --show-labels -n $CHE_NS | tail -n 1 2>/dev/null )"
+    checkForCodewindPod
+
     if [[ $CW_POD =~ codewindWorkspace=.*, ]]; then
         echo""
         RE_RESULT=${BASH_REMATCH}
@@ -112,33 +119,60 @@ function removeCodewindWorkspace() {
 
         # Stop the Codewind Workspace
         echo -e "${MAGENTA}>>> Stopping workspace ${RESET}"
-        HTTPSTATUS=$(curl -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_ENDPOINT/api/workspace/$WORKSPACE_ID/runtime 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+        HTTPSTATUS=$(curl ${SSL_STATUS} -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_ENDPOINT/api/workspace/$WORKSPACE_ID/runtime 2>/dev/null | head -n 1 | cut -d$' ' -f2)
         if [[ $HTTPSTATUS -ne 204 ]]; then
             displayMsg 1 "Codewind workspace has failed to stop. Will attempt to remove the workspace." false
         fi
         displayMsg 0
-        
+
         # We must wait for the workspace to stop before removing it, otherwise the workspace removal fails
         sleep 10
 
+        echo -e -n "${YELLOW}>> Waiting for existing workspace to be stopped .${RESET}"
+        checkForCodewindPod
+        while [[ $CW_POD =~ "Terminating" ]];
+        do
+            sleep 5s
+            checkForCodewindPod
+            echo -e -n "${YELLOW}.${RESET}"
+        done
+
+        echo -e "\n"
+
         # Remove the Codewind Workspace
         echo -e "${MAGENTA}>>> Removing workspace ${RESET}"
-        HTTPSTATUS=$(curl -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_ENDPOINT/api/workspace/$WORKSPACE_ID 2>/dev/null | head -n 1 | cut -d$' ' -f2)
+        HTTPSTATUS=$(curl ${SSL_STATUS} -I --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request DELETE $CHE_ENDPOINT/api/workspace/$WORKSPACE_ID 2>/dev/null | head -n 1 | cut -d$' ' -f2)
         if [[ $HTTPSTATUS -ne 204 ]]; then
             displayMsg 1 "Codewind workspace has failed to be removed." true
         fi
         displayMsg 0
+
+        echo -e -n "${YELLOW}>> Waiting for existing workspace to be removed .${RESET}"
+        checkForCodewindPod
+        while [[ $CW_POD =~ "Terminating" ]];
+        do
+            sleep 5s
+            checkForCodewindPod
+            echo -e -n "${YELLOW}.${RESET}"
+        done
+
+        echo -e "\n"
     fi
 }
 
 function getCheAccessToken() {
-    CHE_ACCESS_TOKEN=$(curl -sSL --data "grant_type=password&client_id=che-public&username=${CHE_USER}&password=${CHE_PASS}" ${TOKEN_ENDPOINT} | jq -r '.access_token')
+    CHE_ACCESS_TOKEN=$(curl ${SSL_STATUS} -sSL --data "grant_type=password&client_id=che-public&username=${CHE_USER}&password=${CHE_PASS}" ${TOKEN_ENDPOINT} | jq -r '.access_token')
 }
 
 function getEndpoints() {
-    CHE_ENDPOINT=$(kubectl get routes --selector=component=che -o jsonpath="{.items[0].spec.host}" 2>&1)
-    KEYCLOAK_HOSTNAME=$(kubectl get routes --selector=component=keycloak -o jsonpath="{.items[0].spec.host}" 2>&1)
-    TOKEN_ENDPOINT="http://${KEYCLOAK_HOSTNAME}/auth/realms/che/protocol/openid-connect/token"
+    if [ "$SSL_STATUS" == "-k" ]; then
+        PROTOCOL="https://"
+    else
+        PROTOCOL="http://"
+    fi
+    CHE_ENDPOINT="${PROTOCOL}$(kubectl get routes --selector=component=che -o jsonpath="{.items[0].spec.host}" 2>&1)"
+    KEYCLOAK_HOSTNAME="${PROTOCOL}$(kubectl get routes --selector=component=keycloak -o jsonpath="{.items[0].spec.host}" 2>&1)"
+    TOKEN_ENDPOINT="${KEYCLOAK_HOSTNAME}/auth/realms/che/protocol/openid-connect/token"
 }
 
 while :; do
@@ -195,6 +229,9 @@ while :; do
         ;;
         --podwaittimeout=?*)
         POD_WAIT_TO=${1#*=}
+        ;;
+        --disable-ssl)
+        SSL_STATUS=""
         ;;
         -h|--help)
         usage
@@ -340,7 +377,7 @@ if [[ "$ADD_DEFAULT_REGISTRY" == "y" ]]; then
     DOCKER_CREDS=$(echo -n "$REGISTRY_CREDS" | $base64Name -w 0)
     TIMESTAMP=$(date +"%s")
 
-    curl "$CHE_ENDPOINT/api/preferences" --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' -H 'Sec-Fetch-Site: same-origin' -H "Content-Type: application/json" --data-binary '{"codenvy:created":'"$TIMESTAMP"',"temporary":"false","git.contribute.activate.projectSelection":"false","dockerCredentials":'"$DOCKER_CREDS"'}'
+    curl ${SSL_STATUS} "$CHE_ENDPOINT/api/preferences" --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' -H 'Sec-Fetch-Site: same-origin' -H "Content-Type: application/json" --data-binary '{"codenvy:created":'"$TIMESTAMP"',"temporary":"false","git.contribute.activate.projectSelection":"false","dockerCredentials":'"$DOCKER_CREDS"'}'
     displayMsg $? "Failed to set docker registry using default docker registry: $DEFAULT_REGISTRY." false
 fi
 
@@ -356,7 +393,7 @@ if [[ "$INSTALL_CW" == "y" ]]; then
     removeCodewindWorkspace
     displayMsg $? "Failed to remove existing codewind workspace." true
 
-    HTTPSTATUS=$(curl -s $DEFAULT_DEVFILE | curl -s --header "Content-Type: text/yaml" --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request POST --data-binary @- -D- -o/dev/null $CHE_ENDPOINT/api/workspace/devfile?start-after-create=true 2>/dev/null | sed -n 3p | cut -d ' ' -f2)
+    HTTPSTATUS=$(curl ${SSL_STATUS} -s $DEFAULT_DEVFILE | curl ${SSL_STATUS} -s --header "Content-Type: text/yaml" --header 'Authorization: Bearer '"$CHE_ACCESS_TOKEN"'' --request POST --data-binary @- -D- -o/dev/null $CHE_ENDPOINT/api/workspace/devfile?start-after-create=true 2>/dev/null | sed -n 3p | cut -d ' ' -f2)
     if [[ $HTTPSTATUS -ne 201 ]]; then
         displayMsg 1 "Codewind workspace setup has failed." true
     fi
