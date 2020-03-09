@@ -319,11 +319,6 @@ if [[ $CLEAN_DEPLOY == "y" ]]; then
     displayMsg $? "Failed to create service account." true
 fi
 
-echo -e "${CYAN}> Installing codewind ODO resources${RESET}"
-rm -rf $CODEWIND_ODO_EXTENSION
-git clone https://github.com/eclipse/codewind-odo-extension > /dev/null 2>&1
-displayMsg $? "Failed to install codewind ODO resource." true
-
 echo -e "${CYAN}> Applying codewind cluster roles${RESET}"
 kubectl apply -f "$CODEWIND_CHE/setup/install_che/codewind-clusterrole.yaml" -n $CHE_NS > /dev/null 2>&1
 displayMsg $? "Failed to apply codewind cluster role." true
@@ -414,10 +409,15 @@ if [[ "$INSTALL_CW" == "y" ]]; then
 	    sleep 2s
         echo -e -n "${YELLOW}.${RESET}"
     done
-fi
 
-cd "$CODEWIND_ODO_EXTENSION/setup"
-echo -e "\n${CYAN}> Performing setup before applying ODO roles${RESET}"
-./setup.sh > /dev/null 2>&1
-displayMsg $? "Failed to perform setup on ODO roles." true
-cd $CURR_DIR
+    echo -e "\n${CYAN}> Installing codewind ODO resources${RESET}"
+    rm -rf $CODEWIND_ODO_EXTENSION
+    git clone https://github.com/eclipse/codewind-odo-extension > /dev/null 2>&1
+    displayMsg $? "Failed to install codewind ODO resource." true
+
+    cd "$CODEWIND_ODO_EXTENSION/setup"
+    echo -e "${CYAN}> Performing setup before applying ODO roles${RESET}"
+    ./setup.sh > /dev/null 2>&1
+    displayMsg $? "Failed to perform setup on ODO roles." true
+    cd $CURR_DIR
+fi
