@@ -175,5 +175,11 @@ teardown() {
     fi
 
     stopCodewindCheWorkspace
+    run getCodewindPod
+    while [[ $output =~ "Terminating" ]];
+    do
+        sleep 5
+        run getCodewindPod
+    done
     deleteCodewindCheWorkspace
 }
