@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2019 IBM Corporation and others.
+# Copyright (c) 2020 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v2.0
 # which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 apiVersion: v2
 publisher: eclipse
 name: codewind-theia
-version: 0.8.0
+version: 0.11.0
 type: VS Code extension
 displayName: Codewind VS Code Extension
 title: Codewind Extension for VS Code
@@ -21,7 +21,7 @@ icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/i
 repository: http://github.com/eclipse/codewind-vscode/
 category: Other
 firstPublicationDate: "2019-05-30"
-latestUpdateDate: "2019-01-09"
+latestUpdateDate: "2020-04-06"
 spec:
   extensions:
-    - http://download.eclipse.org/codewind/codewind-vscode/0.8.0/latest/codewind-theia.vsix
+    - http://download.eclipse.org/codewind/codewind-vscode/0.11.0/latest/codewind-theia.vsix
