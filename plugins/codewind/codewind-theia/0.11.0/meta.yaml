@@ -21,7 +21,7 @@ icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/i
 repository: http://github.com/eclipse/codewind-vscode/
 category: Other
 firstPublicationDate: "2019-05-30"
-latestUpdateDate: "2019-01-09"
+latestUpdateDate: "2020-04-06"
 spec:
   extensions:
     - http://download.eclipse.org/codewind/codewind-vscode/0.11.0/latest/codewind-theia.vsix
