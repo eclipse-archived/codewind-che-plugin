@@ -1,5 +1,5 @@
 
-#  Copyright (c) 2012-2019 Red Hat, Inc.
+#  Copyright (c) 2012-2020 Red Hat, Inc.
 #    This program and the accompanying materials are made
 #    available under the terms of the Eclipse Public License 2.0
 #    which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -19,11 +19,11 @@ spec:
     # server image used in Che deployment
     cheImage: 'quay.io/eclipse/che-server'
     # tag of an image used in Che deployment
-    cheImageTag: '7.9.0'
+    cheImageTag: '7.9.2'
     # image:tag used in Devfile registry deployment
-    devfileRegistryImage: 'quay.io/eclipse/che-devfile-registry:7.9.0'
+    devfileRegistryImage: 'quay.io/eclipse/che-devfile-registry:7.9.2'
     # image:tag used in plugin registry deployment
-    pluginRegistryImage: 'quay.io/eclipse/che-plugin-registry:7.9.0'
+    pluginRegistryImage: 'quay.io/eclipse/che-plugin-registry:7.9.2'
     # defaults to `che`. When set to `codeready`, CodeReady Workspaces is deployed
     # the difference is in images, labels, exec commands
     cheFlavor: ''
@@ -109,7 +109,7 @@ spec:
     # secret used in oAuthClient. Auto generated if left blank
     oAuthSecret: ''
     # image:tag used in Keycloak deployment
-    identityProviderImage: 'quay.io/eclipse/che-keycloak:7.9.0'
+    identityProviderImage: 'quay.io/eclipse/che-keycloak:7.9.2'
   k8s:
     # your global ingress domain
     ingressDomain: ''
