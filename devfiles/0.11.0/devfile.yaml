@@ -18,6 +18,9 @@ components:
     type: cheEditor
     id: eclipse/che-theia/latest
     memoryLimit: 1024Mi
+    env:
+      - name: INSECURE_KEYRING
+        value: "true"
   - alias: codewind-sidecar
     type: chePlugin
     reference: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.11.0/plugins/codewind/codewind-sidecar/0.11.0/meta.yaml
