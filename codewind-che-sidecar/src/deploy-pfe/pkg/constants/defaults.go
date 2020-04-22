@@ -19,7 +19,7 @@ const (
 	PFEImageTag = "0.5"
 
 	// PFEVolumeSize is the size of the volume to use for PFE
-	PFEVolumeSize = "1Gi"
+	PFEVolumeSize = "5Gi"
 
 	// PerformanceTag is the image tag associated with the docker image that's used for the Performance dashboard
 	PerformanceTag = "0.5"

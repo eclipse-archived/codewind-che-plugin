@@ -50,9 +50,9 @@ setup() {
     # Set up Che access token for multi-user Che environment
     CHE_USER="admin"
     CHE_PASS="admin"
-    KEYCLOAK_HOSTNAME=$(kubectl get routes --selector=component=keycloak -o jsonpath="{.items[0].spec.host}" 2>&1)
-    TOKEN_ENDPOINT="http://${KEYCLOAK_HOSTNAME}/auth/realms/che/protocol/openid-connect/token" 
-    export CHE_ACCESS_TOKEN=$(curl -sSL --data "grant_type=password&client_id=che-public&username=${CHE_USER}&password=${CHE_PASS}" ${TOKEN_ENDPOINT} | jq -r '.access_token')
+    KEYCLOAK_HOSTNAME="${PROTOCOL}$(kubectl get routes --selector=component=keycloak -o jsonpath="{.items[0].spec.host}" 2>&1)"
+    TOKEN_ENDPOINT="${KEYCLOAK_HOSTNAME}/auth/realms/che/protocol/openid-connect/token" 
+    export CHE_ACCESS_TOKEN=$(curl -k -sSL --data "grant_type=password&client_id=che-public&username=${CHE_USER}&password=${CHE_PASS}" ${TOKEN_ENDPOINT} | jq -r '.access_token')
 }
 
 # Teardown code after each test
@@ -175,5 +175,11 @@ teardown() {
     fi
 
     stopCodewindCheWorkspace
+    run getCodewindPod
+    while [[ $output =~ "Terminating" ]];
+    do
+        sleep 5
+        run getCodewindPod
+    done
     deleteCodewindCheWorkspace
 }

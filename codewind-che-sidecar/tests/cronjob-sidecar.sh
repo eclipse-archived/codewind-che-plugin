@@ -23,14 +23,28 @@ TEST_OUTPUT_DIR=~/test_results/sidecar/$DATE_NOW/$TIME_NOW
 TEST_OUTPUT_TAP=$TEST_OUTPUT_DIR/test_output.tap
 TEST_OUTPUT_XML=$TEST_OUTPUT_DIR/test_output.xml
 
+# Colors for success and error messages
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+BLUE='\033[0;36m'
+YELLOW='\e[33m'
+RESET='\033[0m'
+
 if [[ (-z $NAMESPACE) ]]; then
   echo -e "${RED}Mandatory argument NAMESPACE is not set up. ${RESET}\n"
   echo -e "${RED}Please export variable NAMESPACE to run the Codewind sidecar tests. ${RESET}\n"
   exit 1
 fi
+
 if [[ (-z $CLUSTER_IP) ]]; then
   echo -e "${RED}Mandatory argument CLUSTER_IP is not set up. ${RESET}\n"
   echo -e "${RED}Please export variable CLUSTER_IP to run the Codewind sidecar tests. ${RESET}\n"
+  exit 1
+fi
+
+if [[ (-z $CLUSTER_PORT) ]]; then
+  echo -e "${RED}Mandatory argument CLUSTER_PORT is not set up. ${RESET}\n"
+  echo -e "${RED}Please export variable CLUSTER_PORT to run the Codewind sidecar tests. ${RESET}\n"
   exit 1
 fi
 
@@ -45,12 +59,21 @@ if [[ (-z $CLUSTER_PASSWORD) ]]; then
   echo -e "${RED}Please export variable CLUSTER_PASSWORD to run the Codewind sidecar tests. ${RESET}\n"
   exit 1
 fi
+
 if [[ (-z $DASHBOARD_IP) ]]; then
   echo -e "${RED}Dashboard IP is required to upload test results. ${RESET}\n"
   exit 1
 fi
 
-oc login $CLUSTER_IP:8443 -u $CLUSTER_USER -p $CLUSTER_PASSWORD
+if [[ (-z $DISABLE_SSL) ]]; then
+  PROTOCOL="https://"
+  echo -e "${BLUE}SSL enabled. ${RESET}\n"
+else
+  PROTOCOL="http://"
+  echo -e "${BLUE}SSL disabled. ${RESET}\n"
+fi
+
+oc login $CLUSTER_IP:$CLUSTER_PORT -u $CLUSTER_USER -p $CLUSTER_PASSWORD
 oc project $NAMESPACE
 if [[ $? -eq 0 ]]; then
   echo -e "${GREEN}Successfully logged into the OKD cluster ${RESET}\n"
@@ -59,9 +82,10 @@ else
   exit 1
 fi
 
-export CHE_INGRESS_DOMAIN=$(kubectl get routes --selector=component=che -o jsonpath="{.items[0].spec.host}" 2>&1)
+export CHE_INGRESS_DOMAIN="${PROTOCOL}$(kubectl get routes --selector=component=che -o jsonpath="{.items[0].spec.host}" 2>&1)"
 export CHE_NAMESPACE=$NAMESPACE
 export CLUSTER_IP
+export PROTOCOL
 
 rm -rf $CODEWIND_CHE_PLUGIN_DIR \
 && mkdir -p $TEST_OUTPUT_DIR \

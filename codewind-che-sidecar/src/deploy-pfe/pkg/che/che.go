@@ -41,7 +41,7 @@ func GetWorkspaceServiceAccount(clientset *kubernetes.Clientset, namespace strin
 
 	// Retrieve the workspace service account labeled with the Che Workspace ID
 	workspacePod, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.original_name=che-workspace-pod,che.workspace_id=" + cheWorkspaceID,
+		LabelSelector: "che.workspace_id=" + cheWorkspaceID,
 	})
 	if err != nil || workspacePod == nil {
 		log.Errorf("Error retrieving the Che workspace pod %v\n", err)
@@ -57,25 +57,6 @@ func GetWorkspaceServiceAccount(clientset *kubernetes.Clientset, namespace strin
 
 }
 
-// GetWorkspaceRegistrySecret retrieves the Kubernetes ImagePullSecret associated with the Che workspace we're deploying Codewind in
-func GetWorkspaceRegistrySecret(clientset *kubernetes.Clientset, namespace string, cheWorkspaceID string) string {
-	var secretName string
-	// Retrieve the secret tagged with the workspace ID label
-	// If the secret is missing, fall back on a default value
-	registrySecret, err := clientset.CoreV1().Secrets(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.workspace_id=" + cheWorkspaceID,
-	})
-	if err != nil {
-		log.Errorf("Error retrieving the list of secrets: %v\n", err)
-		os.Exit(1)
-	} else if len(registrySecret.Items) != 1 {
-		secretName = cheWorkspaceID + "-private-registries"
-	} else {
-		secretName = registrySecret.Items[0].GetName()
-	}
-	return secretName
-}
-
 // GetOwnerReferences retrieves the owner reference name and UID, allowing us to tie any Codewind resources to the Che workspace
 // Enabling the Kubernetes garbage collector clean everything up when the workspace is deleted
 func GetOwnerReferences(clientset *kubernetes.Clientset, namespace string, cheWorkspaceID string) (string, types.UID) {
@@ -84,7 +65,7 @@ func GetOwnerReferences(clientset *kubernetes.Clientset, namespace string, cheWo
 	var ownerReferenceUID types.UID
 
 	workspacePod, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{
-		LabelSelector: "che.original_name=che-workspace-pod,che.workspace_id=" + cheWorkspaceID,
+		LabelSelector: "che.workspace_id=" + cheWorkspaceID,
 	})
 	if err != nil {
 		log.Errorf("Error: Unable to retrieve the workspace pod %v\n", err)

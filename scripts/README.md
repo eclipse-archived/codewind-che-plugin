@@ -2,6 +2,8 @@
 
 The script `./che-setup.sh` can be leveraged to deploy a che instance instance to your favorite OpenShift cluster. At the moment, the script only support openshift kube environment - future enhancement to the script is planned to support other kube environment.
 
+**Note:** This is a convenience script for installing Che for Eclipse Codewind for testing, evaluating or development purposes. It is recommended to follow the official Codewind for Eclipse Che instructions at https://www.eclipse.org/codewind/mdt-che-installinfo.html.
+
 **Script usage**
 ```
 Usage: che-setup.sh: [-<option letter> <option value> | -h]

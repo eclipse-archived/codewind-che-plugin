@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2019 IBM Corporation and others.
+# Copyright (c) 2019, 2020 IBM Corporation and others.
 # All rights reserved. This program and the accompanying materials
 # are made available under the terms of the Eclipse Public License v2.0
 # which accompanies this distribution, and is available at
@@ -18,6 +18,9 @@ components:
     type: cheEditor
     id: eclipse/che-theia/latest
     memoryLimit: 1024Mi
+    env:
+      - name: INSECURE_KEYRING
+        value: "true"
   - alias: codewind-sidecar
     type: chePlugin
     reference: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/master/plugins/codewind/codewind-sidecar/latest/meta.yaml
