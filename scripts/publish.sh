@@ -80,7 +80,7 @@ firstPublicationDate: "2019-05-30"
 latestUpdateDate: "$(date '+%Y-%m-%d')"
 spec:
   extensions:
-    - http://archive.eclipse.org/codewind/codewind-vscode/master/latest/codewind-theia.vsix
+    - http://archive.eclipse.org/codewind/codewind-vscode/master/latest/codewind-che.vsix
 EOF
 
 echo "Published the codewind-sidecar and codewind-theia meta.yamls under $BASE_DIR/publish"
