@@ -24,4 +24,4 @@ firstPublicationDate: "2019-05-30"
 latestUpdateDate: "2020-04-30"
 spec:
   extensions:
-    - http://download.eclipse.org/codewind/codewind-vscode/0.12.0/latest/codewind-che.vsix
+    - https://archive.eclipse.org/codewind/codewind-vscode/0.12.0/latest/codewind-che.vsix
