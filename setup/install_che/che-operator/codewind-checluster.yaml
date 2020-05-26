@@ -9,6 +9,11 @@
 #  Contributors:
 #    Red Hat, Inc. - initial API and implementation
 #    IBM - Codewind specific settings
+#
+#  Instructions:
+#    For instructions on installing Codewind for Eclipse Che using
+#    this codewind-checluster.yaml file, see
+#    https://www.eclipse.org/codewind/che-installinfo.html
 
 apiVersion: org.eclipse.che/v1
 kind: CheCluster
