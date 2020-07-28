@@ -1,0 +1,29 @@
+################################################################################
+# Copyright (c) 2020 IBM Corporation and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v2.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v20.html
+#
+# Contributors:
+#     IBM Corporation - initial API and implementation
+################################################################################
+
+---
+apiVersion: 1.0.0
+metadata:
+  generateName: codewind-che
+components:
+  - alias: theia-ide
+    type: cheEditor
+    reference: https://raw.githubusercontent.com/eclipse/che-plugin-registry/7.16.x/v3/plugins/eclipse/che-theia/7.15.2/meta.yaml
+    memoryLimit: 1024Mi
+    env:
+      - name: INSECURE_KEYRING
+        value: "true"
+  - alias: codewind-sidecar
+    type: chePlugin
+    reference: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.14.1/plugins/codewind/codewind-sidecar/0.14.1/meta.yaml
+  - alias: codewind-theia
+    type: chePlugin
+    reference: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.14.1/plugins/codewind/codewind-theia/0.14.1/meta.yaml

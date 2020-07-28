@@ -10,23 +10,18 @@
 ################################################################################
 
 apiVersion: v2
-version: 0.11.0
-type: Che Plugin
-name: codewind-sidecar
-title: Codewind Che Sidecar
-description: Enables iterative development and deployment in Che
-icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
 publisher: eclipse
-repository: https://github.com/eclipse/codewind-che-plugin
+name: codewind-theia
+version: 0.14.1
+type: VS Code extension
+displayName: Codewind VS Code Extension
+title: Codewind Extension for VS Code
+description: Codewind Extension for Theia
+icon: https://raw.githubusercontent.com/eclipse/codewind-vscode/master/dev/res/img/codewind.png
+repository: http://github.com/eclipse/codewind-vscode/
 category: Other
 firstPublicationDate: "2019-05-30"
-latestUpdateDate: "2020-04-06"
+latestUpdateDate: "2020-07-28"
 spec:
-  containers:
-  - name: codewind-che-sidecar
-    image: eclipse/codewind-che-sidecar:0.11.0
-    volumes:
-      - mountPath: "/projects"
-        name: projects
-    ports:
-      - exposedPort: 9090
+  extensions:
+    - http://archive.eclipse.org/codewind/codewind-vscode/0.14.1/latest/codewind-che.vsix

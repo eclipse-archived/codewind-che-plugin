@@ -16,17 +16,17 @@ metadata:
 components:
   - alias: theia-ide
     type: cheEditor
-    id: eclipse/che-theia/latest
+    reference: https://raw.githubusercontent.com/eclipse/che-plugin-registry/7.16.x/v3/plugins/eclipse/che-theia/7.15.2/meta.yaml
     memoryLimit: 1024Mi
     env:
       - name: INSECURE_KEYRING
         value: "true"
   - alias: codewind-sidecar
     type: chePlugin
-    reference: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.11.0/plugins/codewind/codewind-sidecar/0.11.0/meta.yaml
+    reference: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.14.1/plugins/codewind/codewind-sidecar/0.14.1/meta.yaml
   - alias: codewind-theia
     type: chePlugin
-    reference: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.11.0/plugins/codewind/codewind-theia/0.11.0/meta.yaml
+    reference: https://raw.githubusercontent.com/eclipse/codewind-che-plugin/0.14.1/plugins/codewind/codewind-theia/0.14.1/meta.yaml
   - alias: node-plugin
     type: chePlugin
     id: che-incubator/typescript/latest
